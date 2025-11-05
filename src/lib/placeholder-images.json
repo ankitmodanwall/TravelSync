@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "login-hero",
+      "description": "Aerial view of a stunning coastline with turquoise water and a winding road.",
+      "imageUrl": "https://images.unsplash.com/photo-1760210109908-78909a9a9e5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb2FzdGxpbmUlMjByb2FkfGVufDB8fHx8MTc2MjMyMTkzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coastline road"
+    },
+    {
+      "id": "trip-paris",
+      "description": "Eiffel Tower in Paris at sunset.",
+      "imageUrl": "https://images.unsplash.com/photo-1730993175478-b634849f6536?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwYXJpcyUyMGVpZmZlbHxlbnwwfHx8fDE3NjIyODg5NTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "paris eiffel"
+    },
+    {
+      "id": "trip-japan",
+      "description": "A serene Japanese temple surrounded by autumn leaves.",
+      "imageUrl": "https://images.unsplash.com/photo-1574236170880-fbbca132d83d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxqYXBhbiUyMHRlbXBsZXxlbnwwfHx8fDE3NjIyNTc3MjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "japan temple"
+    },
+    {
+      "id": "trip-costa-rica",
+      "description": "Lush green rainforest with a hanging bridge in Costa Rica.",
+      "imageUrl": "https://images.unsplash.com/photo-1693667627180-4f3285dbc403?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxyYWluZm9yZXN0JTIwYnJpZGdlfGVufDB8fHx8MTc2MjI0MzIxMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "rainforest bridge"
+    },
+    {
+      "id": "trip-greece",
+      "description": "Classic white buildings with blue domes in Santorini, Greece.",
+      "imageUrl": "https://images.unsplash.com/photo-1584721295315-59a79e6d0fa8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxncmVlY2UlMjBzYW50b3Jpbml8ZW58MHx8fHwxNzYyMzIxOTM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "greece santorini"
+    },
+    {
+      "id": "trip-new-york",
+      "description": "The bustling streets of New York City with yellow cabs.",
+      "imageUrl": "https://images.unsplash.com/photo-1662995078950-b86f34d9f042?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxuZXdfeW9yayUyMGNpdHl8ZW58MHx8fHwxNzYyMzIxOTM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "new_york city"
+    },
+    {
+      "id": "trip-peru",
+      "description": "The ancient ruins of Machu Picchu in Peru.",
+      "imageUrl": "https://images.unsplash.com/photo-1600913248959-c1752bdd05e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYWNodV9waWNjaHUlMjBwZXJ1fGVufDB8fHx8MTc2MjMyMTkzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "machu_picchu peru"
+    }
+  ]
 }

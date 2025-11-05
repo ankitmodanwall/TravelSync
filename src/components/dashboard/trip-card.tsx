@@ -13,7 +13,7 @@ export function TripCard({ trip }: { trip: Trip }) {
 
   return (
     <Link href={`/trips/${trip.id}`} className="group block animate-fade-in-up">
-      <Card className="overflow-hidden transition-all duration-300 ease-in-out bg-background/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1">
+      <Card className="overflow-hidden transition-all duration-300 ease-in-out bg-card backdrop-blur-sm hover:shadow-xl hover:-translate-y-1">
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">
             <Image
@@ -27,7 +27,7 @@ export function TripCard({ trip }: { trip: Trip }) {
           </div>
         </CardHeader>
         <CardContent className="p-4">
-          <h3 className="font-headline text-xl font-semibold mb-1 truncate group-hover:text-primary">
+          <h3 className="font-headline text-xl font-semibold mb-1 truncate group-hover:text-primary text-card-foreground">
             {trip.name}
           </h3>
           <div className="flex items-center text-sm text-muted-foreground">

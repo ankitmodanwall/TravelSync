@@ -11,7 +11,7 @@ interface SuggestionCardProps {
 export function SuggestionCard({ suggestion, onOpen }: SuggestionCardProps) {
   return (
     <Card
-      className="group block cursor-pointer overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-background/50 backdrop-blur-sm animate-fade-in-up"
+      className="group block cursor-pointer overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card backdrop-blur-sm animate-fade-in-up"
       onClick={onOpen}
     >
       <div className="relative h-64 w-full">

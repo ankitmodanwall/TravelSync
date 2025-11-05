@@ -35,7 +35,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           'min-h-screen w-full bg-cover bg-center bg-fixed'
         )}
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1539635278303-d4002c07eae3?q=80&w=2070&auto=format&fit=crop')`,
+          backgroundImage: `url('https://images.unsplash.com/photo-1554034483-04fda0d3507b?q=80&w=2070&auto=format&fit=crop')`,
         }}
       >
         <Sidebar collapsible="icon">

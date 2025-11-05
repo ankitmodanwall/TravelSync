@@ -1,0 +1,298 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user profile in the TravelSync application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile photo.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "displayName"
+      ]
+    },
+    "Trip": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Trip",
+      "type": "object",
+      "description": "Represents a trip planned within the TravelSync application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Trip entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the trip."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the trip."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Start date of the trip.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "End date of the trip.",
+          "format": "date-time"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Reference to UserProfile who owns the trip. (Relationship: UserProfile 1:N Trip)"
+        },
+        "collaboratorIds": {
+          "type": "array",
+          "description": "References to UserProfiles who are collaborators on the trip. (Relationship: UserProfile N:N Trip)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "startDate",
+        "endDate",
+        "ownerId"
+      ]
+    },
+    "ItineraryItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ItineraryItem",
+      "type": "object",
+      "description": "Represents an item in a trip itinerary.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ItineraryItem entity."
+        },
+        "tripId": {
+          "type": "string",
+          "description": "Reference to Trip this itinerary item belongs to. (Relationship: Trip 1:N ItineraryItem)"
+        },
+        "day": {
+          "type": "number",
+          "description": "The day number in the itinerary (e.g., Day 1, Day 2)."
+        },
+        "time": {
+          "type": "string",
+          "description": "Time of the activity.",
+          "format": "date-time"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the activity."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notes about the activity."
+        },
+        "imageURL": {
+          "type": "string",
+          "description": "URL of an image associated with the activity.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "tripId",
+        "day",
+        "time",
+        "location"
+      ]
+    },
+    "ChatMessage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ChatMessage",
+      "type": "object",
+      "description": "Represents a chat message within a trip.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ChatMessage entity."
+        },
+        "tripId": {
+          "type": "string",
+          "description": "Reference to Trip this chat message belongs to. (Relationship: Trip 1:N ChatMessage)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to UserProfile who sent the message. (Relationship: UserProfile 1:N ChatMessage)"
+        },
+        "message": {
+          "type": "string",
+          "description": "The content of the chat message."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the message was sent.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "tripId",
+        "userId",
+        "message",
+        "timestamp"
+      ]
+    },
+    "AiSummary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AiSummary",
+      "type": "object",
+      "description": "Represents an AI generated summary of a trip.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AiSummary entity."
+        },
+        "tripId": {
+          "type": "string",
+          "description": "Reference to Trip this summary belongs to. (Relationship: Trip 1:1 AiSummary)"
+        },
+        "summary": {
+          "type": "string",
+          "description": "The AI generated summary of the trip."
+        },
+        "generatedAt": {
+          "type": "string",
+          "description": "Timestamp of when the summary was generated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "tripId",
+        "summary",
+        "generatedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/userProfiles/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information. Document ID is the Firebase Auth UID.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Auth UID of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/trips/{tripId}",
+        "definition": {
+          "entityName": "Trip",
+          "schema": {
+            "$ref": "#/backend/entities/Trip"
+          },
+          "description": "Stores trip information, including ownerId and collaboratorIds for access control.",
+          "params": [
+            {
+              "name": "tripId",
+              "description": "Unique ID of the trip."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/trips/{tripId}/itineraryItems/{itemId}",
+        "definition": {
+          "entityName": "ItineraryItem",
+          "schema": {
+            "$ref": "#/backend/entities/ItineraryItem"
+          },
+          "description": "Stores itinerary items for a specific trip.",
+          "params": [
+            {
+              "name": "tripId",
+              "description": "Unique ID of the trip."
+            },
+            {
+              "name": "itemId",
+              "description": "Unique ID of the itinerary item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/trips/{tripId}/chatMessages/{messageId}",
+        "definition": {
+          "entityName": "ChatMessage",
+          "schema": {
+            "$ref": "#/backend/entities/ChatMessage"
+          },
+          "description": "Stores chat messages for a specific trip.",
+          "params": [
+            {
+              "name": "tripId",
+              "description": "Unique ID of the trip."
+            },
+            {
+              "name": "messageId",
+              "description": "Unique ID of the chat message."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/trips/{tripId}/aiSummary/{summaryId}",
+        "definition": {
+          "entityName": "AiSummary",
+          "schema": {
+            "$ref": "#/backend/entities/AiSummary"
+          },
+          "description": "Stores AI-generated summaries for a specific trip.",
+          "params": [
+            {
+              "name": "tripId",
+              "description": "Unique ID of the trip."
+            },
+            {
+              "name": "summaryId",
+              "description": "Unique ID of the AI summary."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support TravelSync's collaborative trip planning features while prioritizing security and scalability. User profiles are stored in a dedicated collection (`userProfiles`) using their UID as the document ID, providing a simple and secure way to manage user data. Trips are stored in the `trips` collection. Each trip document contains an `ownerId` and a `collaboratorIds` array. The security rules can efficiently check if `request.auth.uid` is equal to `ownerId` or exists in the `collaboratorIds` array. Itinerary items, chat messages, and AI summaries are stored in subcollections under each trip (`trips/{tripId}/itineraryItems`, `trips/{tripId}/chatMessages`, and `trips/{tripId}/aiSummary`), ensuring data locality and efficient querying for trip-related information. This structure facilitates Authorization Independence because access control for a trip is determined by the `ownerId` and `collaboratorIds` stored directly within the trip document, avoiding the need for `get()` calls to parent documents during rule evaluation. The use of path-based ownership for user profiles (`/userProfiles/{userId}`) ensures that only the authenticated user can access their profile data (QAP). Segregation into subcollections ensures that listing itinerary items, messages, or summaries requires membership of a given Trip, therefore fulfilling the Rules Are Not Filters QAP."
+  }
+}

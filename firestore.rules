@@ -1,0 +1,146 @@
+/**
+ * @fileoverview Firestore Security Rules for TravelSync.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a user-ownership and shared-access model for trips,
+ * with strict owner-only access to user profiles. Trips can be owned by a user
+ * and shared with collaborators. Subcollections of trips inherit the trip's
+ * access control.
+ *
+ * Data Structure:
+ * - /userProfiles/{userId}: Stores user profile information, with the document
+ *   ID matching the Firebase Auth UID.
+ * - /trips/{tripId}: Stores trip information, including ownerId and
+ *   collaboratorIds for access control.
+ * - /trips/{tripId}/itineraryItems/{itemId}: Stores itinerary items for a
+ *   specific trip.
+ * - /trips/{tripId}/chatMessages/{messageId}: Stores chat messages for a
+ *   specific trip.
+ * - /trips/{tripId}/aiSummary/{summaryId}: Stores AI-generated summaries for a
+ *   specific trip.
+ *
+ * Key Security Decisions:
+ * - User profiles are strictly private and only accessible by the owning user.
+ * - Trips are accessible to the owner and any listed collaborators.
+ * - Subcollections inherit the access control of their parent trip.
+ * - Listing of user profiles is disallowed.
+ *
+ * Denormalization for Authorization:
+ * The `Trip` document denormalizes authorization data by including both
+ * `ownerId` and `collaboratorIds` directly in the document. This enables
+ * efficient security rules without requiring additional `get()` calls.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Controls access to user profile documents.
+     * @path /userProfiles/{userId}
+     * @allow (create) - If the user's auth UID matches the userId.
+     * @allow (get, update, delete) - If the user's auth UID matches the userId and document exists.
+     * @deny (list) - Listing user profiles is not allowed.
+     * @deny (create, update, delete) - If the user's auth UID does not match the userId.
+     * @principle Enforces strict user-ownership for profile data.
+     */
+    match /userProfiles/{userId} {
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false;
+
+      // Allow self-creation: the user's UID must match the document ID.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability of the userId field.
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to trip documents.
+     * @path /trips/{tripId}
+     * @allow (get, list) - If the user is the owner or a collaborator.
+     * @allow (create) - If the user is authenticated. The ownerId must match the user's UID.
+     * @allow (update, delete) - If the user is the owner and document exists.
+     * @deny (create, update, delete) - If the user is not the owner or a collaborator.
+     * @principle Enforces ownership and shared access for trips.
+     */
+    match /trips/{tripId} {
+      function isOwner(ownerId) {
+        return request.auth.uid == ownerId;
+      }
+
+      function isExistingOwner(ownerId) {
+        return isOwner(ownerId) && resource != null;
+      }
+
+      allow get, list: if request.auth != null && (isOwner(resource.data.ownerId) || resource.data.collaboratorIds.hasAny([request.auth.uid]));
+      allow create: if request.auth != null && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.ownerId);
+      allow delete: if isExistingOwner(resource.data.ownerId);
+
+      /**
+       * @description Controls access to itinerary items within a trip.
+       * @path /trips/{tripId}/itineraryItems/{itemId}
+       * @allow (get, list) - If the user is a member of the trip.
+       * @allow (create) - If the user is a member of the trip.
+       * @allow (update, delete) - If the user is a member of the trip and document exists.
+       * @deny (create, update, delete) - If the user is not a member of the trip.
+       * @principle Inherits access control from the parent trip.
+       */
+      match /itineraryItems/{itemId} {
+        allow get, list: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
+        allow create: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
+        allow update: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]) && resource != null;
+        allow delete: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]) && resource != null;
+      }
+
+      /**
+       * @description Controls access to chat messages within a trip.
+       * @path /trips/{tripId}/chatMessages/{messageId}
+       * @allow (get, list) - If the user is a member of the trip.
+       * @allow (create) - If the user is a member of the trip.
+       * @allow (update, delete) - Denied. Chat messages should not be updated or deleted.
+       * @deny (create, update, delete) - If the user is not a member of the trip.
+       * @principle Inherits access control from the parent trip.
+       */
+      match /chatMessages/{messageId} {
+        allow get, list: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
+        allow create: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
+        allow update: if false;
+        allow delete: if false;
+      }
+
+      /**
+       * @description Controls access to AI summaries within a trip.
+       * @path /trips/{tripId}/aiSummary/{summaryId}
+       * @allow (get, list) - If the user is a member of the trip.
+       * @allow (create) - If the user is a member of the trip.
+       * @allow (update, delete) - If the user is a member of the trip and document exists.
+       * @deny (create, update, delete) - If the user is not a member of the trip.
+       * @principle Inherits access control from the parent trip.
+       */
+      match /aiSummary/{summaryId} {
+        allow get, list: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
+        allow create: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
+        allow update: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]) && resource != null;
+        allow delete: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
+            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]) && resource != null;
+      }
+    }
+  }
+}

@@ -72,6 +72,7 @@ export default function AppSidebar() {
             >
               <Bell />
               <span>Notifications</span>
+              <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 text-xs text-red-400 group-data-[collapsible=icon]:hidden">3</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

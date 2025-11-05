@@ -97,7 +97,7 @@ export default function TripChat({ tripId }: TripChatProps) {
     const messageData = {
       tripId,
       userId: user.uid,
-      userName: user.name,
+      userName: user.name || user.email,
       userPhotoURL: user.photoURL,
       message: newMessage.trim(),
       timestamp: serverTimestamp(),
@@ -113,8 +113,8 @@ export default function TripChat({ tripId }: TripChatProps) {
   };
 
   const getInitials = (name: string | null) => {
-      if (!name) return '';
-      return name.split(' ').map(n => n[0]).join('');
+      if (!name) return 'U';
+      return name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
   }
 
   return (

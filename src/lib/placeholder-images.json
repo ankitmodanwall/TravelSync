@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "login-hero",
-      "description": "Aerial view of a stunning coastline with turquoise water and a winding road.",
-      "imageUrl": "https://images.unsplash.com/photo-1760210109908-78909a9a9e5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb2FzdGxpbmUlMjByb2FkfGVufDB8fHx8MTc2MjMyMTkzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "coastline road"
+      "description": "A person kayaking on a calm, crystal-clear turquoise lake surrounded by mountains.",
+      "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723a996f329?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMGJlYWNofGVufDB8fHx8MTc2MjMyMjAwMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tropical beach"
     },
     {
       "id": "trip-paris",
@@ -21,7 +21,7 @@
     {
       "id": "trip-costa-rica",
       "description": "Lush green rainforest with a hanging bridge in Costa Rica.",
-      "imageUrl": "https://images.unsplash.com/photo-1693667627180-4f3285dbc403?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxyYWluZm9yZXN0JTIwYnJpZGdlfGVufDB8fHx8MTc2MjI0MzIxMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1693667627180-4f3285dbc403?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxyYWluZm9yZXN0JTIwYnJpZGdlfGVufDB8fHx8MTc2MjI0MzIxMnww&ixlib  =rb-4.1.0&q=80&w=1080",
       "imageHint": "rainforest bridge"
     },
     {

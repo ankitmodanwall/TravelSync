@@ -108,6 +108,7 @@ export default function AppSidebar() {
                   <SelectItem value="en">English</SelectItem>
                   <SelectItem value="es">Español</SelectItem>
                   <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="hi">हिन्दी</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -123,6 +124,7 @@ export default function AppSidebar() {
                 <SelectItem value="en">English</SelectItem>
                 <SelectItem value="es">Español</SelectItem>
                 <SelectItem value="fr">Français</SelectItem>
+                <SelectItem value="hi">हिन्दी</SelectItem>
               </SelectContent>
             </Select>
           </div>

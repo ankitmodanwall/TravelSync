@@ -39,3 +39,13 @@ export type Trip = {
   collaboratorIds: string[];
   itinerary?: ItineraryDay[];
 };
+
+export type ChatMessage = {
+    id: string;
+    tripId: string;
+    userId: string;
+    userName: string;
+    userPhotoURL: string | null;
+    message: string;
+    timestamp: Timestamp;
+};

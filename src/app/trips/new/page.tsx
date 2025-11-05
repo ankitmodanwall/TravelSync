@@ -38,7 +38,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { useFirestore } from '@/firebase';
-import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc, Timestamp } from 'firebase/firestore';
 
 const formSchema = z.object({
   destination: z
@@ -95,8 +95,9 @@ export default function NewTripPage() {
       1;
 
     try {
+      // First, create the trip document to get an ID
       const tripsCollection = collection(firestore, 'trips');
-      const newTrip = {
+      const newTripData = {
         name: `Trip to ${values.destination}`,
         destination: values.destination,
         startDate: Timestamp.fromDate(values.dates.from),
@@ -104,31 +105,46 @@ export default function NewTripPage() {
         ownerId: user.uid,
         collaboratorIds: [user.uid],
         imageUrl: `https://picsum.photos/seed/${Math.random()}/600/400`,
-        imageHint: 'travel landscape'
+        imageHint: 'travel landscape',
+        itinerary: [], // Start with an empty itinerary
       };
 
-      const docRef = await addDoc(tripsCollection, newTrip);
-
-      // We can still generate the itinerary, but we don't need to block for it.
-      // This could be stored in the trip document later.
-      generateItineraryFromPrompt({
-        destination: values.destination,
-        duration,
-        tripType: values.tripType,
-      }).then(aiResponse => {
-        console.log('AI Generated Itinerary for trip', docRef.id, ':', aiResponse.itinerary);
-        // Optionally update the trip doc with the itinerary here.
-      }).catch(err => {
-        console.error("Error generating itinerary post-creation:", err);
-        // Don't bother the user if this fails, the trip is already created.
-      });
+      const docRef = await addDoc(tripsCollection, newTripData);
 
       toast({
         title: 'Trip Created!',
-        description: 'Your new adventure has been set up.',
+        description: 'Now generating your AI-powered itinerary...',
       });
 
-      router.push('/dashboard');
+      // Now, generate the itinerary
+      try {
+        const aiResponse = await generateItineraryFromPrompt({
+          destination: values.destination,
+          duration,
+          tripType: values.tripType,
+        });
+
+        // Parse and update the document
+        const itineraryObject = JSON.parse(aiResponse.itinerary);
+        const tripDocRef = doc(firestore, 'trips', docRef.id);
+        await updateDoc(tripDocRef, {
+          itinerary: itineraryObject.itinerary || [],
+        });
+
+        toast({
+          title: 'Itinerary Generated!',
+          description: 'Your new adventure has been planned.',
+        });
+      } catch (aiError) {
+        console.error("Error generating or saving itinerary:", aiError);
+        toast({
+          variant: 'destructive',
+          title: 'AI Itinerary Failed',
+          description: 'Could not generate an itinerary, but your trip was saved. You can try generating it again from the trip page.',
+        });
+      }
+
+      router.push(`/trips/${docRef.id}`);
 
     } catch (error) {
       console.error('Failed to create trip', error);
@@ -137,9 +153,8 @@ export default function NewTripPage() {
         title: 'Uh oh! Something went wrong.',
         description: 'There was a problem creating your trip.',
       });
-    } finally {
       setIsGenerating(false);
-    }
+    } 
   };
 
   return (
@@ -263,10 +278,10 @@ export default function NewTripPage() {
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Trip...
+                    Creating Trip & Itinerary...
                   </>
                 ) : (
-                  'Create Trip'
+                  'Create Trip & Generate Itinerary'
                 )}
               </Button>
             </form>

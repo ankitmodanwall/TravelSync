@@ -2,20 +2,44 @@
 
 import { useParams } from 'next/navigation';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
-import type { Trip } from '@/lib/types';
+import { doc, updateDoc } from 'firebase/firestore';
+import type { Trip, ItineraryDay, Activity } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
-import { Calendar, MapPin } from 'lucide-react';
+import { Calendar, MapPin, Sparkles, Clock, Map, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import TripChat from '@/components/trips/trip-chat';
+import { Button } from '@/components/ui/button';
+import { generateItineraryFromPrompt } from '@/ai/flows/generate-itinerary-from-prompt';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 function TripDetailSkeleton() {
   return (
     <div className="space-y-8">
-      <Skeleton className="h-60 w-full rounded-xl" />
+      <Skeleton className="h-80 w-full rounded-2xl" />
       <div className="space-y-4">
         <Skeleton className="h-10 w-3/4" />
         <Skeleton className="h-6 w-1/2" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2 space-y-6">
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-40 w-full" />
+        </div>
+        <Skeleton className="h-96 w-full" />
       </div>
     </div>
   );
@@ -25,6 +49,8 @@ export default function TripDetailPage() {
   const params = useParams();
   const tripId = params.tripId as string;
   const firestore = useFirestore();
+  const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const tripRef = useMemoFirebase(
     () => (firestore && tripId ? doc(firestore, 'trips', tripId) : null),
@@ -32,6 +58,41 @@ export default function TripDetailPage() {
   );
 
   const { data: trip, isLoading } = useDoc<Trip>(tripRef);
+
+  const handleGenerateItinerary = async () => {
+    if (!trip || !firestore || !tripRef) return;
+
+    setIsGenerating(true);
+    try {
+      const duration = (trip.endDate.toDate().getTime() - trip.startDate.toDate().getTime()) / (1000 * 3600 * 24) + 1;
+      
+      const aiResponse = await generateItineraryFromPrompt({
+        destination: trip.destination,
+        duration: duration,
+        tripType: "leisure", // You might want to store tripType in the trip document
+      });
+
+      const itineraryObject = JSON.parse(aiResponse.itinerary);
+      await updateDoc(tripRef, {
+        itinerary: itineraryObject.itinerary || [],
+      });
+
+      toast({
+        title: 'Itinerary Generated!',
+        description: 'Your AI-powered itinerary has been created.',
+      });
+
+    } catch (error) {
+      console.error("Error generating itinerary:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Generation Failed',
+        description: 'Could not generate an itinerary. Please try again.',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   if (isLoading) {
     return <TripDetailSkeleton />;
@@ -46,7 +107,7 @@ export default function TripDetailPage() {
     : 'Date not set';
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-7xl">
       <div className="relative mb-8 h-80 w-full overflow-hidden rounded-2xl">
         <Image
           src={trip.imageUrl}
@@ -63,8 +124,8 @@ export default function TripDetailPage() {
         </div>
       </div>
       
-      <div className="space-y-6">
-        <div className="flex items-center gap-6 text-lg text-muted-foreground">
+      <div className="mb-8 space-y-6">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-lg text-muted-foreground">
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5" />
             <span>{trip.destination}</span>
@@ -74,14 +135,60 @@ export default function TripDetailPage() {
             <span>{dateRange}</span>
           </div>
         </div>
+      </div>
 
-        <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
-          <h2 className="mb-4 text-2xl font-headline font-semibold">
-            Trip Itinerary
-          </h2>
-          <p className="text-muted-foreground">
-            This is where your AI-generated itinerary and collaborative plans will appear. Stay tuned!
-          </p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="text-primary" />
+                AI-Powered Itinerary
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {trip.itinerary && trip.itinerary.length > 0 ? (
+                <Accordion type="single" collapsible defaultValue="item-0">
+                  {trip.itinerary.map((day: ItineraryDay, index: number) => (
+                    <AccordionItem value={`item-${index}`} key={day.day}>
+                      <AccordionTrigger className="text-lg font-semibold font-headline">
+                        Day {day.day}: {day.title}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4">
+                          {day.activities.map((activity: Activity, activityIndex: number) => (
+                            <div key={activityIndex} className="pl-4 border-l-2 border-primary/50 space-y-1">
+                              <div className="font-semibold text-card-foreground">{activity.description}</div>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-2"><Clock className="h-4 w-4" /> {activity.time}</span>
+                                <span className="flex items-center gap-2"><Map className="h-4 w-4" /> {activity.location}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              ) : (
+                 <div className="text-center py-8 px-4">
+                    <p className="text-muted-foreground mb-4">
+                      No itinerary has been generated for this trip yet.
+                    </p>
+                    <Button onClick={handleGenerateItinerary} disabled={isGenerating}>
+                      {isGenerating ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                      ) : (
+                        <><Sparkles className="mr-2 h-4 w-4" /> Generate Itinerary</>
+                      )}
+                    </Button>
+                  </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <div className="lg:col-span-1">
+          <TripChat tripId={tripId} />
         </div>
       </div>
     </div>

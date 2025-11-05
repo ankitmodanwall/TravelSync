@@ -22,13 +22,14 @@ import { UserNav } from './user-nav';
 import { useAuth } from '@/context/auth-context';
 import { useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { isOpen } = useSidebar();
   
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || (path.length > 1 && pathname.startsWith(path));
 
   return (
     <>
@@ -38,45 +39,50 @@ export default function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              href="/dashboard"
-              isActive={isActive('/dashboard')}
-              tooltip="Dashboard"
-            >
-              <Home />
-              <span>Dashboard</span>
-            </SidebarMenuButton>
+             <Link href="/dashboard" className="w-full">
+                <SidebarMenuButton
+                isActive={isActive('/dashboard')}
+                tooltip="Dashboard"
+                >
+                <Home />
+                <span>Dashboard</span>
+                </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              href="/trips/new"
-              isActive={isActive('/trips/new')}
-              tooltip="New Trip"
-            >
-              <PlusCircle />
-              <span>Create Trip</span>
-            </SidebarMenuButton>
+            <Link href="/trips/new" className="w-full">
+                <SidebarMenuButton
+                isActive={isActive('/trips/new')}
+                tooltip="New Trip"
+                >
+                <PlusCircle />
+                <span>Create Trip</span>
+                </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              href="/budget"
-              isActive={isActive('/budget')}
-              tooltip="Budget"
-            >
-              <Landmark />
-              <span>Budget</span>
-            </SidebarMenuButton>
+            <Link href="/budget" className="w-full">
+                <SidebarMenuButton
+                href="/budget"
+                isActive={isActive('/budget')}
+                tooltip="Budget"
+                >
+                <Landmark />
+                <span>Budget</span>
+                </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              href="/notifications"
-              isActive={isActive('/notifications')}
-              tooltip="Notifications"
-            >
-              <Bell />
-              <span>Notifications</span>
-              {isOpen && <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 text-xs text-red-400">3</span>}
-            </SidebarMenuButton>
+            <Link href="/notifications" className="w-full">
+                <SidebarMenuButton
+                isActive={isActive('/notifications')}
+                tooltip="Notifications"
+                >
+                <Bell />
+                <span>Notifications</span>
+                {isOpen && <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 text-xs text-red-400">3</span>}
+                </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
@@ -86,23 +92,31 @@ export default function AppSidebar() {
             {user ? <UserNav user={user} isSidebarOpen={isOpen} /> : null}
             {isOpen && (
               <div className="flex items-center gap-2">
-                  <SidebarMenuButton href="/settings" isActive={isActive('/settings')} variant="ghost" size="icon" tooltip="Settings">
-                      <Settings className="h-5 w-5"/>
-                  </SidebarMenuButton>
-                  <SidebarMenuButton href="/help" isActive={isActive('/help')} variant="ghost" size="icon" tooltip="Help">
+                <Link href="/settings">
+                    <SidebarMenuButton variant="ghost" size="icon" tooltip="Settings">
+                        <Settings className="h-5 w-5"/>
+                    </SidebarMenuButton>
+                </Link>
+                <Link href="/help">
+                  <SidebarMenuButton variant="ghost" size="icon" tooltip="Help">
                       <HelpCircle className="h-5 w-5"/>
                   </SidebarMenuButton>
+                </Link>
               </div>
             )}
          </div>
          {!isOpen && (
             <div className="flex flex-col gap-2 items-center">
-              <SidebarMenuButton href="/settings" isActive={isActive('/settings')} variant="ghost" size="icon" tooltip="Settings">
-                  <Settings className="h-5 w-5"/>
-              </SidebarMenuButton>
-              <SidebarMenuButton href="/help" isActive={isActive('/help')} variant="ghost" size="icon" tooltip="Help">
-                  <HelpCircle className="h-5 w-5"/>
-              </SidebarMenuButton>
+              <Link href="/settings">
+                <SidebarMenuButton variant="ghost" size="icon" tooltip="Settings">
+                    <Settings className="h-5 w-5"/>
+                </SidebarMenuButton>
+              </Link>
+              <Link href="/help">
+                <SidebarMenuButton variant="ghost" size="icon" tooltip="Help">
+                    <HelpCircle className="h-5 w-5"/>
+                </SidebarMenuButton>
+              </Link>
           </div>
          )}
       </SidebarFooter>

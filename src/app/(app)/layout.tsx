@@ -4,10 +4,11 @@ import {
   Sidebar,
   SidebarInset,
   SidebarTrigger,
+  Sheet,
 } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { PanelLeft } from 'lucide-react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,24 +16,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div
         className="min-h-screen w-full bg-cover bg-center bg-fixed"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1536734261439-80e38a023c8a?q=80&w=2070&auto=format&fit=crop')`,
+          backgroundImage: `url('/background-gradient.png')`,
         }}
       >
-        <div className="min-h-screen w-full bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-violet-900/20">
+        <div className="min-h-screen w-full bg-gradient-to-br from-background/80 via-background/60 to-background/80">
           <Sheet>
             <Header>
-              <SidebarTrigger className="md:hidden" />
+              <SidebarTrigger>
+                 <PanelLeft />
+              </SidebarTrigger>
             </Header>
             <Sidebar>
               <AppSidebar />
             </Sidebar>
-            <SheetContent
-              side="left"
-              className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl md:hidden"
-            >
-              <SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
-              <AppSidebar />
-            </SheetContent>
           </Sheet>
           <SidebarInset>
             <main className="p-6 lg:p-8">{children}</main>

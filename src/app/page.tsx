@@ -44,7 +44,11 @@ export default function WelcomePage() {
               className="object-cover"
               data-ai-hint={welcomeHeroImage.imageHint}
             />
-             <div className="absolute inset-0 bg-gradient-to-l from-black/10 to-transparent" />
+             <div className="absolute inset-0 bg-gradient-to-l from-black/30 to-transparent" />
+             <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-12 text-center drop-shadow-2xl animate-fade-in animation-delay-400">
+                <h2 className="text-5xl font-bold font-headline">TravelSync</h2>
+                <p className="text-2xl mt-4">Your Journey, Synchronized.</p>
+            </div>
           </>
         )}
       </div>

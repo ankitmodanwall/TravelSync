@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signInWithPopup(auth, provider).catch(error => {
       // This error occurs when the user closes the popup.
       // It's a common user action and not a bug, so we can safely ignore it.
-      if (error.code === 'auth/cancelled-popup-request') {
+      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
         return;
       }
       console.error("Google sign-in error", error);

@@ -30,6 +30,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  env: {
+    GCLOUD_PROJECT: process.env.GCLOUD_PROJECT,
+  }
 };
 
 export default nextConfig;

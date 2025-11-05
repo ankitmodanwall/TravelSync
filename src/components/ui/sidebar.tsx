@@ -42,7 +42,9 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
   const [isOpen, setIsOpen] = React.useState(true)
 
   React.useEffect(() => {
-    if (!isDesktop) {
+    if (isDesktop) {
+      setIsOpen(true);
+    } else {
       setIsOpen(false)
     }
   }, [isDesktop])
@@ -56,7 +58,9 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
             isDesktop && isOpen && "md:grid md:grid-cols-[280px_1fr]"
           )}
         >
-          {children}
+           <Sheet open={!isDesktop && isOpen} onOpenChange={(open) => !isDesktop && setIsOpen(open)}>
+            {children}
+          </Sheet>
         </div>
       </TooltipProvider>
     </SidebarContext.Provider>
@@ -71,14 +75,12 @@ export function Sidebar({
 
   if (!isDesktop) {
     return (
-      <Sheet open={isOpen} onOpenChange={(open) => useSidebar().setIsOpen(open)}>
         <SheetContent
           side="left"
           className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl"
         >
           <div className="flex h-full flex-col">{children}</div>
         </SheetContent>
-      </Sheet>
     )
   }
 

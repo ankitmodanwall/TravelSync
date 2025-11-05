@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { PanelLeft } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 import { Button, type ButtonProps } from '@/components/ui/button';
@@ -117,9 +116,8 @@ export function SidebarTrigger({
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-
-  if (isDesktop) {
-    return (
+  
+  const TriggerButton = (
       <Button
         variant="ghost"
         size="icon"
@@ -130,21 +128,15 @@ export function SidebarTrigger({
         {children}
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
-    );
+  )
+
+  if (isDesktop) {
+    return TriggerButton;
   }
   
   return (
     <SheetTrigger asChild>
-       <Button
-        variant="ghost"
-        size="icon"
-        className={cn('h-8 w-8 text-foreground', className)}
-        onClick={handleClick}
-        {...props}
-      >
-        {children}
-        <span className="sr-only">Toggle Sidebar</span>
-      </Button>
+       {TriggerButton}
     </SheetTrigger>
   );
 }

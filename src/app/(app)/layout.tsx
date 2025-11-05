@@ -5,36 +5,72 @@ import {
   SidebarInset,
   SidebarTrigger,
   Sheet,
+  SheetContent,
 } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
 import { PanelLeft } from 'lucide-react';
+import { useSidebar } from '@/components/ui/sidebar';
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+function MobileSidebar() {
   return (
-    <SidebarProvider>
-      <div
-        className="min-h-screen w-full bg-cover bg-center bg-fixed"
-        style={{
-          backgroundImage: `url('/background-gradient.png')`,
-        }}
+    <Sheet>
+      <Header>
+        <SidebarTrigger>
+          <PanelLeft />
+        </SidebarTrigger>
+      </Header>
+      <SheetContent
+        side="left"
+        className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl md:hidden"
       >
-        <div className="min-h-screen w-full bg-gradient-to-br from-background/80 via-background/60 to-background/80">
-          <Sheet>
+        <AppSidebar />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function DesktopSidebar() {
+  const { isOpen } = useSidebar();
+  return (
+    <aside
+      data-collapsed={!isOpen}
+      className="fixed left-0 top-0 z-20 hidden h-screen w-[280px] border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl transition-all duration-300 ease-in-out data-[collapsed=true]:w-[70px] md:block"
+    >
+      <div className="flex h-full flex-col overflow-hidden">
+        <AppSidebar />
+      </div>
+    </aside>
+  );
+}
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { isDesktop } = useSidebar();
+
+  return (
+    <div
+      className="min-h-screen w-full bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage: `url('/background-gradient.png')`,
+      }}
+    >
+      <div className="min-h-screen w-full bg-gradient-to-br from-background/80 via-background/60 to-background/80">
+        {isDesktop ? (
+          <>
+            <DesktopSidebar />
             <Header>
               <SidebarTrigger>
-                 <PanelLeft />
+                <PanelLeft />
               </SidebarTrigger>
             </Header>
-            <Sidebar>
-              <AppSidebar />
-            </Sidebar>
-          </Sheet>
-          <SidebarInset>
-            <main className="p-6 lg:p-8">{children}</main>
-          </SidebarInset>
-        </div>
+          </>
+        ) : (
+          <MobileSidebar />
+        )}
+
+        <SidebarInset>
+          <main className="p-6 lg:p-8">{children}</main>
+        </SidebarInset>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }

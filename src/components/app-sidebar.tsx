@@ -9,13 +9,13 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import {
-  Bell,
   Home,
   Settings,
   PlusCircle,
   HelpCircle,
   Landmark,
   Globe,
+  CalendarCheck,
 } from 'lucide-react';
 import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
@@ -93,14 +93,13 @@ export default function AppSidebar() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/notifications" className="w-full">
+            <Link href="/updates" className="w-full">
                 <SidebarMenuButton
-                isActive={isActive('/notifications')}
-                tooltip={t('notifications')}
+                isActive={isActive('/updates')}
+                tooltip={t('updates')}
                 >
-                <Bell />
-                <span>{t('notifications')}</span>
-                {isOpen && <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 text-xs text-red-400">3</span>}
+                <CalendarCheck />
+                <span>{t('updates')}</span>
                 </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>

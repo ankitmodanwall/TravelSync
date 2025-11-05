@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { Card, CardContent } from '@/components/ui/card';
-import { Itinerary, Map, MessageSquare } from 'lucide-react';
+import { ClipboardList, Map, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const previewCards = [
   {
-    icon: <Itinerary className="w-8 h-8 text-blue-400" />,
+    icon: <ClipboardList className="w-8 h-8 text-blue-400" />,
     title: 'Itinerary',
     description: 'Day 1: Eiffel Tower, Louvre',
     rotation: '-rotate-6',

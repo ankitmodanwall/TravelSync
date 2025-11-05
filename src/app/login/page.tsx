@@ -25,6 +25,8 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -33,6 +35,8 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,9 +46,20 @@ export default function LoginPage() {
     },
   });
 
-
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    login(values.email, values.password);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await login(values.email, values.password);
+      router.push('/dashboard');
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description:
+          error.code === 'auth/invalid-credential'
+            ? 'Invalid email or password.'
+            : 'An unexpected error occurred.',
+      });
+    }
   };
 
   const loginHeroImage = placeholderImages.find(p => p.id === 'login-hero');
@@ -117,8 +132,12 @@ export default function LoginPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Login
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
                 </Button>
                 <Button
                   variant="outline"

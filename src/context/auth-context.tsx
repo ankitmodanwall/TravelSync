@@ -14,11 +14,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   updateProfile,
+  createUserWithEmailAndPassword,
 } from 'firebase/auth';
-import {
-  initiateEmailSignIn,
-  initiateEmailSignUp,
-} from '@/firebase/non-blocking-login';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { doc } from 'firebase/firestore';
 
@@ -32,10 +29,10 @@ type User = {
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => void;
   logout: () => void;
-  signup: (email: string, password: string, name: string) => void;
+  signup: (email: string, password: string, name: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -72,8 +69,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [firebaseUser, firestore]);
 
-  const login = (email: string, password: string) => {
-    initiateEmailSignIn(auth, email, password);
+  const login = async (email: string, password: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error('Login error', error);
+      // Optionally re-throw or handle specific errors for UI feedback
+      throw error;
+    }
   };
 
   const loginWithGoogle = () => {
@@ -93,14 +96,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
-      const userCredential = await initiateEmailSignUp(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       if (userCredential && userCredential.user) {
         await updateProfile(userCredential.user, { displayName: name });
-        // The useEffect hook will handle creating the firestore doc
-        // and setting the user state.
+        
+        // Manually update the local user state to trigger redirects faster
+        const updatedUser = userCredential.user;
+        setUser({
+          uid: updatedUser.uid,
+          name: updatedUser.displayName,
+          email: updatedUser.email,
+          photoURL: updatedUser.photoURL,
+        });
+
+        // The useEffect will also run to sync firestore, but this state update is faster.
       }
     } catch (error) {
       console.error('Sign up error', error);
+      throw error;
     }
   };
 

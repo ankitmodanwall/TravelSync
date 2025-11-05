@@ -28,6 +28,8 @@ import {
 import { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required.' }),
@@ -42,6 +44,8 @@ type FormValues = z.infer<typeof formSchema>;
 export default function SignupPage() {
   const { signup, loginWithGoogle } = useAuth();
   const [step, setStep] = useState(1);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -52,8 +56,20 @@ export default function SignupPage() {
     },
   });
 
-  const onSubmit = (values: FormValues) => {
-    signup(values.email, values.password, values.name);
+  const onSubmit = async (values: FormValues) => {
+    try {
+      await signup(values.email, values.password, values.name);
+      router.push('/dashboard');
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign-up Failed',
+        description:
+          error.code === 'auth/email-already-in-use'
+            ? 'This email is already registered.'
+            : 'An unexpected error occurred.',
+      });
+    }
   };
 
   const handleNext = async () => {
@@ -187,8 +203,14 @@ export default function SignupPage() {
                 )}
 
                 {step === 3 && (
-                  <Button type="submit" className="w-full">
-                    Create Account
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={form.formState.isSubmitting}
+                  >
+                    {form.formState.isSubmitting
+                      ? 'Creating Account...'
+                      : 'Create Account'}
                   </Button>
                 )}
 

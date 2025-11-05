@@ -6,12 +6,12 @@ import {
   useFirestore,
   useCollection,
   useMemoFirebase,
+  addDocumentNonBlocking,
 } from '@/firebase';
 import {
   collection,
   query,
   orderBy,
-  addDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 import type { ChatMessage } from '@/lib/types';
@@ -28,47 +28,51 @@ import { Send, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '../ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 interface TripChatProps {
   tripId: string;
 }
 
 function ChatSkeleton() {
-    return (
-        <div className="space-y-4">
-            <div className="flex items-start gap-3">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-4 w-1/2" />
-                </div>
-            </div>
-             <div className="flex items-start flex-row-reverse gap-3">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="space-y-2 flex-1 items-end flex flex-col">
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-4 w-1/2" />
-                </div>
-            </div>
-             <div className="flex items-start gap-3">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-1/3" />
-                </div>
-            </div>
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start gap-3">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-1/2" />
         </div>
-    )
+      </div>
+      <div className="flex flex-row-reverse items-start gap-3">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <div className="flex flex-1 flex-col items-end space-y-2">
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+      <div className="flex items-start gap-3">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-1/3" />
+        </div>
+      </div>
+    </div>
+  );
 }
-
 
 export default function TripChat({ tripId }: TripChatProps) {
   const { user } = useAuth();
   const firestore = useFirestore();
+  const { toast } = useToast();
   const [newMessage, setNewMessage] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const messagesRef = useMemoFirebase(
-    () => (firestore ? collection(firestore, `trips/${tripId}/chatMessages`) : null),
+    () =>
+      firestore
+        ? collection(firestore, `trips/${tripId}/chatMessages`)
+        : null,
     [firestore, tripId]
   );
 
@@ -77,48 +81,58 @@ export default function TripChat({ tripId }: TripChatProps) {
     [messagesRef]
   );
 
-  const { data: messages, isLoading } = useCollection<ChatMessage>(messagesQuery);
-  
+  const { data: messages, isLoading } =
+    useCollection<ChatMessage>(messagesQuery);
+
   useEffect(() => {
     // Scroll to bottom when messages load or new messages arrive
     if (scrollAreaRef.current) {
-        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (viewport) {
-            viewport.scrollTop = viewport.scrollHeight;
-        }
+      const viewport = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      );
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight;
+      }
     }
   }, [messages]);
 
-
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !messagesRef || newMessage.trim() === '') return;
 
     const messageData = {
       tripId,
       userId: user.uid,
-      userName: user.name || user.email,
+      userName: user.name,
       userPhotoURL: user.photoURL,
       message: newMessage.trim(),
       timestamp: serverTimestamp(),
     };
 
-    try {
-      await addDoc(messagesRef, messageData);
-      setNewMessage('');
-    } catch (error) {
+    addDocumentNonBlocking(messagesRef, messageData).catch(error => {
       console.error('Error sending message:', error);
-      // You could add a toast notification here
-    }
+      toast({
+        variant: 'destructive',
+        title: 'Send Failed',
+        description: 'Could not send your message. Please try again.',
+      });
+    });
+
+    setNewMessage('');
   };
 
   const getInitials = (name: string | null) => {
-      if (!name) return 'U';
-      return name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-  }
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
 
   return (
-    <Card className="flex flex-col h-[70vh]">
+    <Card className="flex h-[70vh] flex-col">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="text-primary" />
@@ -127,33 +141,38 @@ export default function TripChat({ tripId }: TripChatProps) {
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
         <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
-            {isLoading && <ChatSkeleton />}
-            <div className="space-y-4">
-                {messages?.map(msg => (
+          {isLoading && <ChatSkeleton />}
+          <div className="space-y-4">
+            {messages?.map(msg => (
+              <div
+                key={msg.id}
+                className={`flex items-start gap-3 ${
+                  user?.uid === msg.userId ? 'flex-row-reverse' : ''
+                }`}
+              >
+                <Avatar>
+                  <AvatarImage src={msg.userPhotoURL || undefined} />
+                  <AvatarFallback>{getInitials(msg.userName)}</AvatarFallback>
+                </Avatar>
                 <div
-                    key={msg.id}
-                    className={`flex items-start gap-3 ${
-                    user?.uid === msg.userId ? 'flex-row-reverse' : ''
-                    }`}
+                  className={`max-w-[75%] rounded-lg p-3 ${
+                    user?.uid === msg.userId
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                  }`}
                 >
-                    <Avatar>
-                        <AvatarImage src={msg.userPhotoURL || undefined} />
-                        <AvatarFallback>{getInitials(msg.userName)}</AvatarFallback>
-                    </Avatar>
-                    <div className={`p-3 rounded-lg max-w-[75%] ${
-                        user?.uid === msg.userId
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}>
-                        <p className="text-sm">{msg.message}</p>
-                    </div>
+                  <p className="text-sm">{msg.message}</p>
                 </div>
-                ))}
-            </div>
+              </div>
+            ))}
+          </div>
         </ScrollArea>
       </CardContent>
       <CardFooter>
-        <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
+        <form
+          onSubmit={handleSendMessage}
+          className="flex w-full items-center space-x-2"
+        >
           <Input
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
@@ -161,7 +180,11 @@ export default function TripChat({ tripId }: TripChatProps) {
             autoComplete="off"
             disabled={!user}
           />
-          <Button type="submit" size="icon" disabled={!user || newMessage.trim() === ''}>
+          <Button
+            type="submit"
+            size="icon"
+            disabled={!user || newMessage.trim() === ''}
+          >
             <Send className="h-4 w-4" />
             <span className="sr-only">Send</span>
           </Button>

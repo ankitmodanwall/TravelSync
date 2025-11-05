@@ -69,6 +69,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "budget": {
+          "type": "number",
+          "description": "The total budget for the trip."
         }
       },
       "required": [
@@ -122,6 +126,48 @@
         "day",
         "time",
         "location"
+      ]
+    },
+    "BudgetItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BudgetItem",
+      "type": "object",
+      "description": "Represents a single budget item or expense for a trip.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the BudgetItem entity."
+        },
+        "tripId": {
+          "type": "string",
+          "description": "Reference to the Trip this budget item belongs to."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or description of the expense."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The cost of the item."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the expense.",
+          "enum": ["transport", "accommodation", "food", "activities", "other"]
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date of the expense."
+        }
+      },
+      "required": [
+        "id",
+        "tripId",
+        "name",
+        "amount",
+        "category",
+        "date"
       ]
     },
     "AiSummary": {
@@ -213,6 +259,26 @@
             {
               "name": "itemId",
               "description": "Unique ID of the itinerary item."
+            }
+          ]
+        }
+      },
+       {
+        "path": "/trips/{tripId}/budgetItems/{budgetItemId}",
+        "definition": {
+          "entityName": "BudgetItem",
+          "schema": {
+            "$ref": "#/backend/entities/BudgetItem"
+          },
+          "description": "Stores budget items for a specific trip.",
+          "params": [
+            {
+              "name": "tripId",
+              "description": "Unique ID of the trip."
+            },
+            {
+              "name": "budgetItemId",
+              "description": "Unique ID of the budget item."
             }
           ]
         }

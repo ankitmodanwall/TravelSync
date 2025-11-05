@@ -27,8 +27,17 @@ export type ItineraryDay = {
   activities: Activity[];
 };
 
+export type BudgetItem = {
+    id: string;
+    tripId: string;
+    name: string;
+    amount: number;
+    category: 'transport' | 'accommodation' | 'food' | 'activities' | 'other';
+    date: Timestamp;
+}
+
 export type Trip = {
-  id: string;
+  id:string;
   name: string;
   destination: string;
   startDate: Timestamp;
@@ -38,4 +47,5 @@ export type Trip = {
   ownerId: string;
   collaboratorIds: string[];
   itinerary?: ItineraryDay[];
+  budget?: number;
 };

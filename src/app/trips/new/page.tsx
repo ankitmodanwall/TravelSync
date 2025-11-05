@@ -52,6 +52,10 @@ const formSchema = z.object({
     { required_error: 'Please select a date range.' }
   ),
   tripType: z.string({ required_error: 'Please select a trip type.' }),
+  budget: z.preprocess(
+    (a) => parseFloat(z.string().parse(a)),
+    z.number().positive({ message: "Budget must be a positive number." }).optional()
+  ),
 });
 
 export default function NewTripPage() {
@@ -107,6 +111,7 @@ export default function NewTripPage() {
         imageUrl: `https://picsum.photos/seed/${Math.random()}/600/400`,
         imageHint: 'travel landscape',
         itinerary: [], // Start with an empty itinerary
+        budget: values.budget || 0,
       };
 
       const docRef = await addDoc(tripsCollection, newTripData);
@@ -244,36 +249,54 @@ export default function NewTripPage() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="tripType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type of Trip</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <FormField
+                  control={form.control}
+                  name="tripType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type of Trip</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a trip style" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="adventure">Adventure</SelectItem>
+                          <SelectItem value="budget">Budget</SelectItem>
+                          <SelectItem value="leisure">Leisure</SelectItem>
+                          <SelectItem value="family">Family-Friendly</SelectItem>
+                          <SelectItem value="romantic">Romantic</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        This helps us tailor suggestions for you.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="budget"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Budget ($)</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a trip style" />
-                        </SelectTrigger>
+                        <Input type="number" placeholder="e.g., 2000" {...field} onChange={event => field.onChange(event.target.value)} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="adventure">Adventure</SelectItem>
-                        <SelectItem value="budget">Budget</SelectItem>
-                        <SelectItem value="leisure">Leisure</SelectItem>
-                        <SelectItem value="family">Family-Friendly</SelectItem>
-                        <SelectItem value="romantic">Romantic</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      This helps us tailor suggestions for you.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormDescription>
+                        Set an optional budget for this trip.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <Button type="submit" disabled={isGenerating}>
                 {isGenerating ? (
                   <>

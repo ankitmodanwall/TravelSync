@@ -15,6 +15,7 @@ import {
   PlusCircle,
   HelpCircle,
   Landmark,
+  Globe,
 } from 'lucide-react';
 import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
@@ -23,6 +24,13 @@ import { useAuth } from '@/context/auth-context';
 import { useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -87,6 +95,38 @@ export default function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="flex flex-col gap-4">
+        {isOpen ? (
+            <div className="px-4">
+              <Select defaultValue="en">
+                <SelectTrigger className="w-full">
+                  <div className='flex items-center gap-2'>
+                    <Globe className='h-4 w-4'/>
+                    <SelectValue placeholder="Language" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+        ) : (
+          <div className='px-2'>
+            <Select defaultValue="en">
+              <SelectTrigger className="w-full justify-center">
+                 <SelectValue asChild>
+                    <Globe className='h-4 w-4' />
+                 </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="es">Español</SelectItem>
+                <SelectItem value="fr">Français</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <SidebarSeparator />
          <div className={cn("flex items-center", isOpen ? "justify-between" : "justify-center")}>
             {user ? <UserNav user={user} isSidebarOpen={isOpen} /> : null}

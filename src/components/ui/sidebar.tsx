@@ -7,7 +7,7 @@ import { PanelLeft } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/lib/utils"
 import { Button, type ButtonProps } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { SheetTrigger } from "@/components/ui/sheet"
 import {
   Tooltip,
   TooltipContent,
@@ -59,25 +59,13 @@ export function Sidebar({
   className,
   children,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const { isOpen, isDesktop } = useSidebar()
-
-  if (!isDesktop) {
-     return (
-      <SheetContent
-        side="left"
-        className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl"
-      >
-        <SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
-        <div className="flex h-full flex-col">{children}</div>
-      </SheetContent>
-    );
-  }
+  const { isOpen } = useSidebar()
 
   return (
     <aside
       data-collapsed={!isOpen}
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen w-0 md:w-[280px] border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl transition-all duration-300 ease-in-out",
+        "fixed left-0 top-16 z-20 hidden h-[calc(100vh-4rem)] w-0 md:block md:w-[280px] border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl transition-all duration-300 ease-in-out",
         "data-[collapsed=true]:md:w-[70px]",
         className
       )}
@@ -95,7 +83,7 @@ export function SidebarInset({
   return (
     <div
       className={cn(
-        "transition-all duration-300 ease-in-out w-full",
+        "transition-all duration-300 ease-in-out w-full pt-16",
         isDesktop && (isOpen ? "md:pl-[280px]" : "md:pl-[70px]"),
         className
       )}
@@ -319,3 +307,4 @@ export const SidebarSeparator = React.forwardRef<
   />
 ))
 SidebarSeparator.displayName = "SidebarSeparator"
+export { Sheet, SheetContent, SheetTitle } from "./sheet"

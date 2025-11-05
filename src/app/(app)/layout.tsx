@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,12 +19,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }}
       >
         <div className="min-h-screen w-full bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-violet-900/20">
-          <Header>
-            <SidebarTrigger className="md:hidden" />
-          </Header>
-          <Sidebar>
-            <AppSidebar />
-          </Sidebar>
+          <Sheet>
+            <Header>
+              <SidebarTrigger className="md:hidden" />
+            </Header>
+            <Sidebar>
+              <AppSidebar />
+            </Sidebar>
+            <SheetContent
+              side="left"
+              className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl md:hidden"
+            >
+              <SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
+              <AppSidebar />
+            </SheetContent>
+          </Sheet>
           <SidebarInset>
             <main className="p-6 lg:p-8">{children}</main>
           </SidebarInset>

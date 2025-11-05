@@ -41,7 +41,7 @@ export default function AppSidebar() {
               tooltip="Dashboard"
             >
               <Home />
-              Dashboard
+              <span>Dashboard</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -51,7 +51,7 @@ export default function AppSidebar() {
               tooltip="New Trip"
             >
               <PlusCircle />
-              Create Trip
+              <span>Create Trip</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -61,7 +61,7 @@ export default function AppSidebar() {
               tooltip="Budget"
             >
               <Landmark />
-              Budget
+              <span>Budget</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -71,7 +71,7 @@ export default function AppSidebar() {
               tooltip="Notifications"
             >
               <Bell />
-              Notifications
+              <span>Notifications</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

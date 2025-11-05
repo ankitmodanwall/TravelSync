@@ -37,7 +37,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           'dark:from-indigo-900/50 dark:via-sky-900/50 dark:to-cyan-900/50'
         )}
       >
-        <Sidebar>
+        <Sidebar collapsible="icon">
           <AppSidebar />
         </Sidebar>
         <SidebarInset>

@@ -36,8 +36,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           <AuthProvider>
-            <AuthRedirect />
-            {children}
+            <AuthRedirect>{children}</AuthRedirect>
             <Toaster />
           </AuthProvider>
         </FirebaseClientProvider>

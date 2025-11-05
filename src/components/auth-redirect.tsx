@@ -2,33 +2,45 @@
 
 import { useAuth } from '@/context/auth-context';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 const AUTH_ROUTES = ['/login', '/signup', '/'];
-const PROTECTED_ROUTE_PREFIX = '/dashboard';
+const PROTECTED_ROUTES = ['/dashboard', '/budget', '/trips/new'];
 
-export function AuthRedirect() {
+export function AuthRedirect({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
+  const isAuthRoute = AUTH_ROUTES.includes(pathname);
+  const isProtectedRoute = PROTECTED_ROUTES.some(route =>
+    pathname.startsWith(route)
+  );
+
   useEffect(() => {
     if (loading) {
-      return; // Wait until loading is complete
+      return; // Wait until loading is complete before doing anything
     }
-
-    const isAuthRoute = AUTH_ROUTES.includes(pathname);
-    const isProtectedRoute = pathname.startsWith(PROTECTED_ROUTE_PREFIX) || pathname === '/budget' || pathname.startsWith('/trips/');
-
 
     if (user && isAuthRoute) {
-      // User is logged in but on an auth page, redirect to dashboard
       router.replace('/dashboard');
     } else if (!user && isProtectedRoute) {
-      // User is not logged in and trying to access a protected page, redirect to welcome page
       router.replace('/');
     }
-  }, [user, loading, router, pathname]);
+  }, [user, loading, router, pathname, isAuthRoute, isProtectedRoute]);
 
-  return null; // This component does not render anything
+  // While loading, or if redirection is about to happen, don't render children
+  if (loading || (user && isAuthRoute) || (!user && isProtectedRoute)) {
+    // You can return a global loader here if you have one
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          {/* You can use your Skeleton component or any other loader */}
+        </div>
+      </div>
+    );
+  }
+
+  // If no redirection is needed, render the page content
+  return <>{children}</>;
 }

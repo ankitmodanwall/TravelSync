@@ -8,13 +8,13 @@ import React, {
   useEffect,
 } from 'react';
 import { useUser, useAuth as useFirebaseAuth, useFirestore } from '@/firebase';
-import type { User as FirebaseUser } from 'firebase/auth';
 import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
   updateProfile,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { doc } from 'firebase/firestore';
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
         { merge: true }
       );
-      
+
       setUser({
         uid: firebaseUser.uid,
         name: firebaseUser.displayName,
@@ -74,7 +74,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.error('Login error', error);
-      // Optionally re-throw or handle specific errors for UI feedback
       throw error;
     }
   };
@@ -82,8 +81,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider).catch(error => {
-      // This error occurs when the user closes the popup.
-      // It's a common user action and not a bug, so we can safely ignore it.
       if (
         error.code === 'auth/cancelled-popup-request' ||
         error.code === 'auth/popup-closed-by-user'
@@ -96,20 +93,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       if (userCredential && userCredential.user) {
         await updateProfile(userCredential.user, { displayName: name });
+        // After profile update, re-fetch the user to get the latest data
+        await userCredential.user.reload();
+        const updatedUser = auth.currentUser;
         
-        // Manually update the local user state to trigger redirects faster
-        const updatedUser = userCredential.user;
-        setUser({
-          uid: updatedUser.uid,
-          name: updatedUser.displayName,
-          email: updatedUser.email,
-          photoURL: updatedUser.photoURL,
-        });
-
-        // The useEffect will also run to sync firestore, but this state update is faster.
+        if (updatedUser) {
+           setUser({
+            uid: updatedUser.uid,
+            name: updatedUser.displayName,
+            email: updatedUser.email,
+            photoURL: updatedUser.photoURL,
+          });
+        }
       }
     } catch (error) {
       console.error('Sign up error', error);

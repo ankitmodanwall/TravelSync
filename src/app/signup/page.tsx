@@ -28,7 +28,6 @@ import {
 import { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -44,7 +43,6 @@ type FormValues = z.infer<typeof formSchema>;
 export default function SignupPage() {
   const { signup, loginWithGoogle } = useAuth();
   const [step, setStep] = useState(1);
-  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -59,7 +57,7 @@ export default function SignupPage() {
   const onSubmit = async (values: FormValues) => {
     try {
       await signup(values.email, values.password, values.name);
-      router.push('/dashboard');
+      // Redirection is handled by AuthRedirect component
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -229,7 +227,7 @@ export default function SignupPage() {
                   variant="outline"
                   className="w-full"
                   type="button"
-                  onClick={() => loginWithGoogle()}
+                  onClick={loginWithGoogle}
                 >
                   <svg
                     className="mr-2 h-4 w-4"

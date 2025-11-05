@@ -25,7 +25,6 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -35,7 +34,6 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,7 +47,7 @@ export default function LoginPage() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await login(values.email, values.password);
-      router.push('/dashboard');
+      // Redirection is handled by AuthRedirect component
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -143,7 +141,7 @@ export default function LoginPage() {
                   variant="outline"
                   className="w-full"
                   type="button"
-                  onClick={() => loginWithGoogle()}
+                  onClick={loginWithGoogle}
                 >
                   <svg
                     className="mr-2 h-4 w-4"

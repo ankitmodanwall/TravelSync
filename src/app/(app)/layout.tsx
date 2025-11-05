@@ -6,12 +6,10 @@ import {
 } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
-import { AuthRedirect } from '@/components/auth-redirect';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   
   return (
-    <AuthRedirect>
       <SidebarProvider>
         <div
           className='min-h-screen w-full bg-cover bg-center bg-fixed'
@@ -30,6 +28,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </SidebarProvider>
-    </AuthRedirect>
   );
 }

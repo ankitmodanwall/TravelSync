@@ -10,47 +10,36 @@ export default function WelcomePage() {
   const welcomeHeroImage = placeholderImages.find(p => p.id === 'welcome-hero');
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[450px] gap-8 text-center">
-          <div className="flex justify-center">
-            <Logo />
-          </div>
-          <div className="grid gap-4 animate-fade-in animation-delay-200">
-            <h1 className="text-4xl md:text-5xl font-bold font-headline leading-tight">
-              Craft Your Next Adventure
-            </h1>
-            <p className="text-balance text-muted-foreground text-lg">
-              Our AI-powered planner helps you build the perfect itinerary, discover hidden gems, and collaborate with friends. Effortless planning, unforgettable journeys.
-            </p>
-          </div>
-          <div className="flex flex-col gap-4 mx-auto w-full max-w-sm animate-fade-in-up animation-delay-400">
-            <Button asChild size="lg" className="w-full text-lg">
-              <Link href="/signup">Start Planning with AI ✈️</Link>
-            </Button>
-            <Button asChild variant="link" size="lg" className="w-full">
-              <Link href="/login">Already have an account? Log In</Link>
-            </Button>
-          </div>
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-background">
+      {welcomeHeroImage && (
+        <Image
+          src={welcomeHeroImage.imageUrl}
+          alt={welcomeHeroImage.description}
+          fill
+          className="object-cover brightness-[0.4]"
+          data-ai-hint={welcomeHeroImage.imageHint}
+        />
+      )}
+      <div className="relative z-10 mx-auto grid w-[450px] gap-8 text-center text-white">
+        <div className="flex justify-center">
+          <Logo className="[&>span]:text-white" />
         </div>
-      </div>
-      <div className="hidden bg-muted lg:block relative">
-        {welcomeHeroImage && (
-          <>
-            <Image
-              src={welcomeHeroImage.imageUrl}
-              alt={welcomeHeroImage.description}
-              fill
-              className="object-cover"
-              data-ai-hint={welcomeHeroImage.imageHint}
-            />
-             <div className="absolute inset-0 bg-gradient-to-l from-black/30 to-transparent" />
-             <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-12 text-center drop-shadow-2xl animate-fade-in animation-delay-400">
-                <h2 className="text-5xl font-bold font-headline">TravelSync</h2>
-                <p className="text-2xl mt-4">Your Journey, Synchronized.</p>
-            </div>
-          </>
-        )}
+        <div className="grid gap-4 animate-fade-in animation-delay-200">
+          <h1 className="text-4xl md:text-5xl font-bold font-headline leading-tight">
+            Craft Your Next Adventure
+          </h1>
+          <p className="text-balance text-lg text-white/80">
+            Our AI-powered planner helps you build the perfect itinerary, discover hidden gems, and collaborate with friends. Effortless planning, unforgettable journeys.
+          </p>
+        </div>
+        <div className="flex flex-col gap-4 mx-auto w-full max-w-sm animate-fade-in-up animation-delay-400">
+          <Button asChild size="lg" className="w-full text-lg">
+            <Link href="/signup">Start Planning with AI ✈️</Link>
+          </Button>
+          <Button asChild variant="link" size="lg" className="w-full text-white/90 hover:text-white">
+            <Link href="/login">Already have an account? Log In</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

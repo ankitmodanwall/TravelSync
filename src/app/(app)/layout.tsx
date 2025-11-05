@@ -7,20 +7,13 @@ import {
 } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/');
-    }
-  }, [user, loading, router]);
-
+  // The AuthRedirect component now handles redirection.
+  // We can show a loading skeleton while the user state is being determined.
   if (loading || !user) {
     return (
       <div className="flex h-screen w-full items-center justify-center">

@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -26,7 +25,6 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { useEffect } from 'react';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -34,9 +32,7 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { login, loginWithGoogle, user, loading } = useAuth();
-  const searchParams = useSearchParams();
+  const { login, loginWithGoogle } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,12 +42,6 @@ export default function LoginPage() {
     },
   });
 
-  useEffect(() => {
-    if (!loading && user) {
-      const from = searchParams.get('from') || '/dashboard';
-      router.replace(from);
-    }
-  }, [user, loading, router, searchParams]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     login(values.email, values.password);

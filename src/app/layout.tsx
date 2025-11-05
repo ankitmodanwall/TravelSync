@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/auth-context';
 import { FirebaseClientProvider } from '@/firebase';
+import { AuthRedirect } from '@/components/auth-redirect';
 
 export const metadata: Metadata = {
   title: 'TravelSync',
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <FirebaseClientProvider>
           <AuthProvider>
+            <AuthRedirect />
             {children}
             <Toaster />
           </AuthProvider>

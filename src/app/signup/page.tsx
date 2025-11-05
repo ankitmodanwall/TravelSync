@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -26,7 +25,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft } from 'lucide-react';
 
@@ -41,9 +40,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function SignupPage() {
-  const router = useRouter();
-  const { signup, loginWithGoogle, user, loading } = useAuth();
-  const searchParams = useSearchParams();
+  const { signup, loginWithGoogle } = useAuth();
   const [step, setStep] = useState(1);
 
   const form = useForm<FormValues>({
@@ -54,13 +51,6 @@ export default function SignupPage() {
       password: '',
     },
   });
-
-  useEffect(() => {
-    if (!loading && user) {
-      const from = searchParams.get('from') || '/dashboard';
-      router.replace(from);
-    }
-  }, [user, loading, router, searchParams]);
 
   const onSubmit = (values: FormValues) => {
     signup(values.email, values.password, values.name);

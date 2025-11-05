@@ -8,25 +8,24 @@ import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  
   return (
-      <SidebarProvider>
-        <div
-          className='min-h-screen w-full bg-cover bg-center bg-fixed'
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1536734261439-80e38a023c8a?q=80&w=2070&auto=format&fit=crop')`,
-          }}
-        >
-          <div className="min-h-screen w-full bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-violet-900/20">
-            <Sidebar collapsible='icon'>
-              <AppSidebar />
-            </Sidebar>
-            <SidebarInset>
-              <Header />
-              <main className='p-4 sm:p-6 lg:p-8'>{children}</main>
-            </SidebarInset>
-          </div>
+    <SidebarProvider>
+      <div
+        className="min-h-screen w-full bg-cover bg-center bg-fixed"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1536734261439-80e38a023c8a?q=80&w=2070&auto=format&fit=crop')`,
+        }}
+      >
+        <div className="min-h-screen w-full bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-violet-900/20">
+          <Sidebar collapsible="icon">
+            <AppSidebar />
+          </Sidebar>
+          <SidebarInset>
+            <Header />
+            <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+          </SidebarInset>
         </div>
-      </SidebarProvider>
+      </div>
+    </SidebarProvider>
   );
 }

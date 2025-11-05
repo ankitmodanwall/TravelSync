@@ -17,12 +17,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }}
       >
         <div className="min-h-screen w-full bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-violet-900/20">
+          <Header />
           <Sidebar>
             <AppSidebar />
           </Sidebar>
           <SidebarInset>
-            <Header />
-            <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+            <main className="p-6 lg:p-8">{children}</main>
           </SidebarInset>
         </div>
       </div>

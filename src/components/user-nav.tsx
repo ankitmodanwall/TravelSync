@@ -22,7 +22,7 @@ interface UserNavProps {
     isSidebarOpen?: boolean;
 }
 
-export function UserNav({ user, isSidebarOpen }: UserNavProps) {
+export function UserNav({ user, isSidebarOpen = true }: UserNavProps) {
   const { logout } = useAuth();
   const router = useRouter();
 

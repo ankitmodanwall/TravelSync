@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function BudgetPage() {
   return (
     <div className="space-y-8">
-      <div className="space-y-1">
+      <div className="space-y-2">
         <h1 className="text-3xl md:text-4xl font-headline font-bold">
           Trip Budgets
         </h1>

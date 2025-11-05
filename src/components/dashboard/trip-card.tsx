@@ -12,7 +12,7 @@ export function TripCard({ trip }: { trip: Trip }) {
     : 'Date not set';
 
   return (
-    <Link href={`/trips/${trip.id}`} className="group block animate-fade-in-up">
+    <Link href={`/trips/${trip.id}`} className="group block">
       <Card className="overflow-hidden transition-all duration-300 ease-in-out bg-card backdrop-blur-sm hover:shadow-xl hover:-translate-y-1">
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">

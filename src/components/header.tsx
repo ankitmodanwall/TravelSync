@@ -12,13 +12,13 @@ export default function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-30 flex h-16 items-center gap-4 border-b px-4 backdrop-blur-sm md:px-6',
-        'border-sidebar-border bg-background/10'
+        'sticky top-0 z-30 flex h-16 items-center gap-4 border-b px-4 md:px-6',
+        'border-sidebar-border bg-background/10 backdrop-blur-sm'
       )}
     >
-        <SidebarTrigger className="md:flex" />
+      <SidebarTrigger className="md:hidden" />
       
-      <div className="flex w-full items-center justify-end gap-4">
+      <div className="flex w-full items-center justify-end gap-2 md:gap-4">
         <Button
           asChild
           size="sm"

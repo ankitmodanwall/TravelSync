@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import type { TravelSuggestion } from '@/lib/suggestions';
 import { Badge } from '../ui/badge';
 
@@ -11,7 +11,7 @@ interface SuggestionCardProps {
 export function SuggestionCard({ suggestion, onOpen }: SuggestionCardProps) {
   return (
     <Card
-      className="group block cursor-pointer overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card backdrop-blur-sm animate-fade-in-up"
+      className="group block cursor-pointer overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl bg-card backdrop-blur-sm"
       onClick={onOpen}
     >
       <div className="relative h-64 w-full">

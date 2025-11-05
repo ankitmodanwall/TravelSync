@@ -48,13 +48,12 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
   return (
     <SidebarContext.Provider value={{ isOpen, setIsOpen, isDesktop }}>
       <TooltipProvider delayDuration={0}>
-         <Sheet open={!isDesktop ? isOpen : false} onOpenChange={setIsOpen}>
-           {children}
-         </Sheet>
+        {children}
       </TooltipProvider>
     </SidebarContext.Provider>
   )
 }
+
 
 export function Sidebar({
   className,
@@ -63,15 +62,15 @@ export function Sidebar({
   const { isOpen, isDesktop } = useSidebar()
 
   if (!isDesktop) {
-    return (
-        <SheetContent
-          side="left"
-          className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl"
-        >
-          <SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
-          <div className="flex h-full flex-col">{children}</div>
-        </SheetContent>
-    )
+     return (
+      <SheetContent
+        side="left"
+        className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl"
+      >
+        <SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
+        <div className="flex h-full flex-col">{children}</div>
+      </SheetContent>
+    );
   }
 
   return (
@@ -97,7 +96,7 @@ export function SidebarInset({
     <div
       className={cn(
         "transition-all duration-300 ease-in-out w-full",
-        isDesktop && (isOpen ? "md:ml-[280px]" : "md:ml-[70px]"),
+        isDesktop && (isOpen ? "md:pl-[280px]" : "md:pl-[70px]"),
         className
       )}
     >
@@ -117,7 +116,7 @@ export function SidebarTrigger({
   }
 
   return (
-     <SheetTrigger asChild>
+    <SheetTrigger asChild>
       <Button
         variant="ghost"
         size="icon"
@@ -142,7 +141,7 @@ export const SidebarHeader = React.forwardRef<
       ref={ref}
       className={cn(
         "flex h-16 items-center border-b border-sidebar-border px-4 transition-all duration-300 ease-in-out",
-        !isOpen && "px-[22px]",
+        !isOpen && "justify-center px-0",
         className
       )}
       {...props}
@@ -173,7 +172,7 @@ export const SidebarFooter = React.forwardRef<
       ref={ref}
       className={cn(
         "mt-auto border-t border-sidebar-border p-4 transition-all",
-        !isOpen && "p-2",
+        !isOpen && "p-2 justify-center",
         className
       )}
       {...props}

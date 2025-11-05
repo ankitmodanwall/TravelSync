@@ -113,8 +113,8 @@ export default function NewTripPage() {
   };
 
   return (
-    <div>
-       <div className="space-y-1 mb-8">
+    <div className='max-w-4xl mx-auto'>
+       <div className="space-y-2 mb-8">
           <h1 className="text-3xl md:text-4xl font-headline font-bold">
             Plan a New Trip
           </h1>

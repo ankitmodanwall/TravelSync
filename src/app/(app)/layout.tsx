@@ -1,7 +1,6 @@
 'use client';
 import {
   SidebarProvider,
-  Sidebar,
   SidebarInset,
   SidebarTrigger,
   Sheet,
@@ -43,9 +42,9 @@ function DesktopSidebar() {
     </aside>
   );
 }
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isDesktop } = useSidebar();
 
+function AppLayoutContent({ children }: { children: React.ReactNode }) {
+  const { isDesktop } = useSidebar();
   return (
     <div
       className="min-h-screen w-full bg-cover bg-center bg-fixed"
@@ -72,5 +71,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarInset>
       </div>
     </div>
+  );
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </SidebarProvider>
   );
 }

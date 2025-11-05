@@ -36,6 +36,9 @@ import { useEffect, useState } from 'react';
 import { generateItineraryFromPrompt } from '@/ai/flows/generate-itinerary-from-prompt';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/auth-context';
+import { useFirestore } from '@/firebase';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
 
 const formSchema = z.object({
   destination: z
@@ -56,6 +59,8 @@ export default function NewTripPage() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
+  const { user } = useAuth();
+  const firestore = useFirestore();
   
   const destinationParam = searchParams.get('destination');
 
@@ -74,6 +79,15 @@ export default function NewTripPage() {
 
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!user || !firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be logged in to create a trip.',
+      });
+      return;
+    }
+
     setIsGenerating(true);
     const duration =
       (values.dates.to.getTime() - values.dates.from.getTime()) /
@@ -81,31 +95,47 @@ export default function NewTripPage() {
       1;
 
     try {
-      // In a real app, you would save the trip to a database first
-      // and get a trip ID.
-      const aiResponse = await generateItineraryFromPrompt({
+      const tripsCollection = collection(firestore, 'trips');
+      const newTrip = {
+        name: `Trip to ${values.destination}`,
+        destination: values.destination,
+        startDate: Timestamp.fromDate(values.dates.from),
+        endDate: Timestamp.fromDate(values.dates.to),
+        ownerId: user.uid,
+        collaboratorIds: [user.uid],
+        imageUrl: `https://picsum.photos/seed/${Math.random()}/600/400`,
+        imageHint: 'travel landscape'
+      };
+
+      const docRef = await addDoc(tripsCollection, newTrip);
+
+      // We can still generate the itinerary, but we don't need to block for it.
+      // This could be stored in the trip document later.
+      generateItineraryFromPrompt({
         destination: values.destination,
         duration,
         tripType: values.tripType,
+      }).then(aiResponse => {
+        console.log('AI Generated Itinerary for trip', docRef.id, ':', aiResponse.itinerary);
+        // Optionally update the trip doc with the itinerary here.
+      }).catch(err => {
+        console.error("Error generating itinerary post-creation:", err);
+        // Don't bother the user if this fails, the trip is already created.
       });
 
-      console.log('AI Generated Itinerary:', aiResponse.itinerary);
-      
       toast({
         title: 'Trip Created!',
         description: 'Your new adventure has been set up.',
       });
 
-      // We'll simulate creating the trip and redirecting.
-      // In a real app, you'd redirect to `/trips/[new-trip-id]`
       router.push('/dashboard');
 
     } catch (error) {
-      console.error('Failed to generate itinerary', error);
+      console.error('Failed to create trip', error);
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem generating your itinerary.',
+        description: 'There was a problem creating your trip.',
       });
     } finally {
       setIsGenerating(false);
@@ -187,6 +217,7 @@ export default function NewTripPage() {
                           selected={field.value as DateRange}
                           onSelect={field.onChange}
                           numberOfMonths={2}
+                          disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
                         />
                       </PopoverContent>
                     </Popover>
@@ -232,10 +263,10 @@ export default function NewTripPage() {
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating Itinerary...
+                    Creating Trip...
                   </>
                 ) : (
-                  'Create & Generate Itinerary'
+                  'Create Trip'
                 )}
               </Button>
             </form>

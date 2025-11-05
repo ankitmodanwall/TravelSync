@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
 const AUTH_ROUTES = ['/login', '/signup', '/'];
-const PROTECTED_ROUTES = ['/dashboard', '/budget', '/trips/new'];
+const PROTECTED_ROUTES = ['/dashboard', '/budget', '/trips/new', '/notifications'];
 
 export function AuthRedirect({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -33,9 +33,9 @@ export function AuthRedirect({ children }: { children: ReactNode }) {
   if (loading || (user && isAuthRoute) || (!user && isProtectedRoute)) {
     // You can return a global loader here if you have one
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex h-screen w-full items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          {/* You can use your Skeleton component or any other loader */}
+           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
     );

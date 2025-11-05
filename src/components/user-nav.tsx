@@ -11,16 +11,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/context/auth-context';
-import { CreditCard, LogOut, Settings, User } from 'lucide-react';
+import { CreditCard, LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
+import type { User } from '@/lib/types';
 
 
-export function UserNav() {
-  const { user, logout } = useAuth();
+interface UserNavProps {
+    user: User;
+    isSidebarOpen?: boolean;
+}
+
+export function UserNav({ user, isSidebarOpen }: UserNavProps) {
+  const { logout } = useAuth();
   const router = useRouter();
-  const { isOpen } = useSidebar();
 
   const handleLogout = () => {
     logout();
@@ -34,15 +38,16 @@ export function UserNav() {
         .split(' ')
         .map(n => n[0])
         .join('')
-    : '';
+    : user.email?.charAt(0).toUpperCase() || '';
 
-  if (!isOpen) {
+  // Collapsed sidebar / header view
+  if (!isSidebarOpen) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={user.photoURL || ''} alt={`@${user.name}`} />
+              <AvatarImage src={user.photoURL || ''} alt={user.name || user.email || ''} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
           </Button>
@@ -59,7 +64,7 @@ export function UserNav() {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
+              <UserIcon className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </DropdownMenuItem>
             <DropdownMenuItem>
@@ -81,15 +86,16 @@ export function UserNav() {
     );
   }
 
+  // Expanded sidebar view
   return (
     <div className="flex items-center gap-3">
        <Avatar className="h-9 w-9">
-          <AvatarImage src={user.photoURL || ''} alt={`@${user.name}`} />
+          <AvatarImage src={user.photoURL || ''} alt={user.name || user.email || ''} />
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
-      <div className={cn("flex flex-col space-y-0.5", !isOpen && "hidden")}>
-        <p className="text-sm font-medium leading-none">{user.name}</p>
-        <p className="text-xs leading-none text-muted-foreground">
+      <div className={cn("flex flex-col space-y-0.5", !isSidebarOpen && "hidden")}>
+        <p className="text-sm font-medium leading-none truncate">{user.name}</p>
+        <p className="text-xs leading-none text-muted-foreground truncate">
           {user.email}
         </p>
       </div>

@@ -6,6 +6,7 @@ import React, {
   useState,
   ReactNode,
   useEffect,
+  useCallback,
 } from 'react';
 import { useUser, useAuth as useFirebaseAuth, useFirestore } from '@/firebase';
 import {
@@ -15,6 +16,7 @@ import {
   updateProfile,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  User as FirebaseUser,
 } from 'firebase/auth';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { doc } from 'firebase/firestore';
@@ -43,31 +45,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const firestore = useFirestore();
   const [user, setUser] = useState<User | null>(null);
 
+  const syncUserProfile = useCallback(
+    (fbUser: FirebaseUser) => {
+      if (firestore && fbUser) {
+        const userRef = doc(firestore, 'userProfiles', fbUser.uid);
+        setDocumentNonBlocking(
+          userRef,
+          {
+            id: fbUser.uid,
+            email: fbUser.email,
+            displayName: fbUser.displayName,
+            photoURL: fbUser.photoURL,
+          },
+          { merge: true }
+        );
+
+        setUser({
+          uid: fbUser.uid,
+          name: fbUser.displayName,
+          email: fbUser.email,
+          photoURL: fbUser.photoURL,
+        });
+      }
+    },
+    [firestore]
+  );
+
   useEffect(() => {
     if (firebaseUser) {
-      // Create user profile in Firestore if it doesn't exist
-      const userRef = doc(firestore, 'userProfiles', firebaseUser.uid);
-      setDocumentNonBlocking(
-        userRef,
-        {
-          id: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-        },
-        { merge: true }
-      );
-
-      setUser({
-        uid: firebaseUser.uid,
-        name: firebaseUser.displayName,
-        email: firebaseUser.email,
-        photoURL: firebaseUser.photoURL,
-      });
+      syncUserProfile(firebaseUser);
     } else {
       setUser(null);
     }
-  }, [firebaseUser, firestore]);
+  }, [firebaseUser, syncUserProfile]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -100,18 +110,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       );
       if (userCredential && userCredential.user) {
         await updateProfile(userCredential.user, { displayName: name });
-        // After profile update, re-fetch the user to get the latest data
-        await userCredential.user.reload();
-        const updatedUser = auth.currentUser;
-        
-        if (updatedUser) {
-           setUser({
-            uid: updatedUser.uid,
-            name: updatedUser.displayName,
-            email: updatedUser.email,
-            photoURL: updatedUser.photoURL,
-          });
-        }
+        // The onAuthStateChanged listener will handle the user state update,
+        // but we can immediately sync the profile to ensure data consistency.
+        syncUserProfile(userCredential.user);
       }
     } catch (error) {
       console.error('Sign up error', error);

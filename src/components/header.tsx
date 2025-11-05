@@ -1,13 +1,14 @@
 import { SidebarTrigger } from './ui/sidebar';
-import { Logo } from './logo';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UserNav } from './user-nav';
+import { useAuth } from '@/context/auth-context';
 
 
 export default function Header() {
+  const { user } = useAuth();
   return (
     <header
       className={cn(
@@ -28,7 +29,7 @@ export default function Header() {
             <span className="hidden sm:inline">New Trip</span>
           </Link>
         </Button>
-        <UserNav />
+        { user && <UserNav user={user} /> }
       </div>
     </header>
   );

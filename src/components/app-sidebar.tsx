@@ -83,7 +83,7 @@ export default function AppSidebar() {
       <SidebarFooter className="flex flex-col gap-4">
         <SidebarSeparator />
          <div className={cn("flex items-center", isOpen ? "justify-between" : "justify-center")}>
-            {user && (isOpen || !user.name) ? <UserNav /> : null}
+            {user ? <UserNav user={user} isSidebarOpen={isOpen} /> : null}
             {isOpen && (
               <div className="flex items-center gap-2">
                   <SidebarMenuButton href="/settings" isActive={isActive('/settings')} variant="ghost" size="icon" tooltip="Settings">

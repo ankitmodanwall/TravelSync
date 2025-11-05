@@ -53,7 +53,7 @@ const formSchema = z.object({
   ),
   tripType: z.string({ required_error: 'Please select a trip type.' }),
   budget: z.preprocess(
-    (a) => (a ? parseFloat(z.string().parse(a)) : undefined),
+    (a) => (a === '' || a === undefined ? undefined : parseFloat(z.string().parse(a))),
     z.number().positive({ message: 'Budget must be a positive number.' }).optional()
   ),
 });
@@ -72,6 +72,7 @@ export default function NewTripPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       destination: destinationParam || '',
+      budget: undefined,
     },
   });
 
@@ -288,7 +289,7 @@ export default function NewTripPage() {
                     <FormItem>
                       <FormLabel>Budget ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g., 2000" {...field} onChange={event => field.onChange(event.target.value)} />
+                        <Input type="number" placeholder="e.g., 2000" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormDescription>
                         Set an optional budget for this trip.

@@ -42,26 +42,15 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
   const [isOpen, setIsOpen] = React.useState(true)
 
   React.useEffect(() => {
-    if (isDesktop) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false)
-    }
+    setIsOpen(isDesktop);
   }, [isDesktop])
 
   return (
     <SidebarContext.Provider value={{ isOpen, setIsOpen, isDesktop }}>
       <TooltipProvider delayDuration={0}>
-        <div
-          className={cn(
-            "h-screen w-full flex-col",
-            isDesktop && isOpen && "md:grid md:grid-cols-[280px_1fr]"
-          )}
-        >
-           <Sheet open={!isDesktop && isOpen} onOpenChange={(open) => !isDesktop && setIsOpen(open)}>
-            {children}
-          </Sheet>
-        </div>
+         <Sheet open={!isDesktop && isOpen} onOpenChange={(open) => !isDesktop && setIsOpen(open)}>
+           {children}
+         </Sheet>
       </TooltipProvider>
     </SidebarContext.Provider>
   )
@@ -71,7 +60,7 @@ export function Sidebar({
   className,
   children,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const { isOpen, isDesktop } = useSidebar()
+  const { isDesktop } = useSidebar()
 
   if (!isDesktop) {
     return (
@@ -88,7 +77,7 @@ export function Sidebar({
     <aside
       className={cn(
         "fixed left-0 top-0 z-40 h-screen w-0 md:w-[280px] border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl transition-all duration-300 ease-in-out",
-        isOpen ? "md:w-[280px]" : "md:w-[70px]",
+        "data-[collapsed=true]:md:w-[70px]",
         className
       )}
     >
@@ -106,7 +95,7 @@ export function SidebarInset({
     <div
       className={cn(
         "transition-all duration-300 ease-in-out w-full",
-        isDesktop && isOpen ? "md:ml-[280px]" : "md:ml-[70px]",
+        isDesktop && (isOpen ? "md:ml-[280px]" : "md:ml-[70px]"),
         className
       )}
     >
@@ -125,33 +114,34 @@ export function SidebarTrigger({
     setIsOpen(!isOpen)
   }
 
-  if (isDesktop) {
+  if (!isDesktop) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className={cn("h-8 w-8 text-foreground", className)}
-        onClick={handleClick}
-        {...props}
-      >
-        <PanelLeft className="h-5 w-5" />
-        <span className="sr-only">Toggle Sidebar</span>
-      </Button>
+       <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn("h-8 w-8 text-foreground", className)}
+          {...props}
+        >
+          <PanelLeft className="h-5 w-5" />
+          <span className="sr-only">Toggle Sidebar</span>
+        </Button>
+      </SheetTrigger>
     )
   }
 
+
   return (
-    <SheetTrigger asChild>
-      <Button
-        variant="ghost"
-        size="icon"
-        className={cn("h-8 w-8 text-foreground", className)}
-        {...props}
-      >
-        <PanelLeft className="h-5 w-5" />
-        <span className="sr-only">Toggle Sidebar</span>
-      </Button>
-    </SheetTrigger>
+    <Button
+      variant="ghost"
+      size="icon"
+      className={cn("h-8 w-8 text-foreground", className)}
+      onClick={handleClick}
+      {...props}
+    >
+      <PanelLeft className="h-5 w-5" />
+      <span className="sr-only">Toggle Sidebar</span>
+    </Button>
   )
 }
 
@@ -208,13 +198,16 @@ SidebarFooter.displayName = "SidebarFooter"
 export const SidebarMenu = React.forwardRef<
   HTMLUListElement,
   React.HTMLAttributes<HTMLUListElement>
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-col gap-1 p-4", className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const { isOpen } = useSidebar();
+  return (
+    <ul
+      ref={ref}
+      className={cn("flex flex-col gap-1 p-4", !isOpen && "px-2", className)}
+      {...props}
+    />
+  )
+})
 SidebarMenu.displayName = "SidebarMenu"
 
 export const SidebarMenuItem = React.forwardRef<

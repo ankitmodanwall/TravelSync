@@ -32,13 +32,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/app/i18n';
 import { useEffect } from 'react';
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { isOpen } = useSidebar();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleLanguageChange = (lang: string) => {
     i18n.changeLanguage(lang);

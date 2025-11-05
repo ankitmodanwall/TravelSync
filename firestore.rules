@@ -14,8 +14,6 @@
  *   collaboratorIds for access control.
  * - /trips/{tripId}/itineraryItems/{itemId}: Stores itinerary items for a
  *   specific trip.
- * - /trips/{tripId}/chatMessages/{messageId}: Stores chat messages for a
- *   specific trip.
  * - /trips/{tripId}/aiSummary/{summaryId}: Stores AI-generated summaries for a
  *   specific trip.
  *
@@ -102,24 +100,6 @@ service cloud.firestore {
             || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]) && resource != null;
         allow delete: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
             || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]) && resource != null;
-      }
-
-      /**
-       * @description Controls access to chat messages within a trip.
-       * @path /trips/{tripId}/chatMessages/{messageId}
-       * @allow (get, list) - If the user is a member of the trip.
-       * @allow (create) - If the user is a member of the trip.
-       * @allow (update, delete) - Denied. Chat messages should not be updated or deleted.
-       * @deny (create, update, delete) - If the user is not a member of the trip.
-       * @principle Inherits access control from the parent trip.
-       */
-      match /chatMessages/{messageId} {
-        allow get, list: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
-            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
-        allow create: if get(/databases/$(database)/documents/trips/$(tripId)).data.ownerId == request.auth.uid
-            || get(/databases/$(database)/documents/trips/$(tripId)).data.collaboratorIds.hasAny([request.auth.uid]);
-        allow update: if false;
-        allow delete: if false;
       }
 
       /**

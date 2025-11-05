@@ -124,42 +124,6 @@
         "location"
       ]
     },
-    "ChatMessage": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ChatMessage",
-      "type": "object",
-      "description": "Represents a chat message within a trip.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ChatMessage entity."
-        },
-        "tripId": {
-          "type": "string",
-          "description": "Reference to Trip this chat message belongs to. (Relationship: Trip 1:N ChatMessage)"
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to UserProfile who sent the message. (Relationship: UserProfile 1:N ChatMessage)"
-        },
-        "message": {
-          "type": "string",
-          "description": "The content of the chat message."
-        },
-        "timestamp": {
-          "type": "string",
-          "description": "Timestamp of when the message was sent.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "tripId",
-        "userId",
-        "message",
-        "timestamp"
-      ]
-    },
     "AiSummary": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "AiSummary",
@@ -249,26 +213,6 @@
             {
               "name": "itemId",
               "description": "Unique ID of the itinerary item."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/trips/{tripId}/chatMessages/{messageId}",
-        "definition": {
-          "entityName": "ChatMessage",
-          "schema": {
-            "$ref": "#/backend/entities/ChatMessage"
-          },
-          "description": "Stores chat messages for a specific trip.",
-          "params": [
-            {
-              "name": "tripId",
-              "description": "Unique ID of the trip."
-            },
-            {
-              "name": "messageId",
-              "description": "Unique ID of the chat message."
             }
           ]
         }

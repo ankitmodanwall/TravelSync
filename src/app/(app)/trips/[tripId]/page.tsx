@@ -20,7 +20,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import TripChat from '@/components/trips/trip-chat';
 import { Button } from '@/components/ui/button';
 import { generateItineraryFromPrompt } from '@/ai/flows/generate-itinerary-from-prompt';
 import { useState } from 'react';
@@ -34,12 +33,9 @@ function TripDetailSkeleton() {
         <Skeleton className="h-10 w-3/4" />
         <Skeleton className="h-6 w-1/2" />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-6">
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-40 w-full" />
-        </div>
-        <Skeleton className="h-96 w-full" />
+      <div className="space-y-6">
+        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-40 w-full" />
       </div>
     </div>
   );
@@ -137,60 +133,53 @@ export default function TripDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="text-primary" />
-                AI-Powered Itinerary
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {trip.itinerary && trip.itinerary.length > 0 ? (
-                <Accordion type="single" collapsible defaultValue="item-0">
-                  {trip.itinerary.map((day: ItineraryDay, index: number) => (
-                    <AccordionItem value={`item-${index}`} key={day.day}>
-                      <AccordionTrigger className="text-lg font-semibold font-headline">
-                        Day {day.day}: {day.title}
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="space-y-4">
-                          {day.activities.map((activity: Activity, activityIndex: number) => (
-                            <div key={activityIndex} className="pl-4 border-l-2 border-primary/50 space-y-1">
-                              <div className="font-semibold text-card-foreground">{activity.description}</div>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <span className="flex items-center gap-2"><Clock className="h-4 w-4" /> {activity.time}</span>
-                                <span className="flex items-center gap-2"><Map className="h-4 w-4" /> {activity.location}</span>
-                              </div>
-                            </div>
-                          ))}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="text-primary" />
+            AI-Powered Itinerary
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {trip.itinerary && trip.itinerary.length > 0 ? (
+            <Accordion type="single" collapsible defaultValue="item-0">
+              {trip.itinerary.map((day: ItineraryDay, index: number) => (
+                <AccordionItem value={`item-${index}`} key={day.day}>
+                  <AccordionTrigger className="text-lg font-semibold font-headline">
+                    Day {day.day}: {day.title}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4">
+                      {day.activities.map((activity: Activity, activityIndex: number) => (
+                        <div key={activityIndex} className="pl-4 border-l-2 border-primary/50 space-y-1">
+                          <div className="font-semibold text-card-foreground">{activity.description}</div>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-2"><Clock className="h-4 w-4" /> {activity.time}</span>
+                            <span className="flex items-center gap-2"><Map className="h-4 w-4" /> {activity.location}</span>
+                          </div>
                         </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              ) : (
-                 <div className="text-center py-8 px-4">
-                    <p className="text-muted-foreground mb-4">
-                      No itinerary has been generated for this trip yet.
-                    </p>
-                    <Button onClick={handleGenerateItinerary} disabled={isGenerating}>
-                      {isGenerating ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
-                      ) : (
-                        <><Sparkles className="mr-2 h-4 w-4" /> Generate Itinerary</>
-                      )}
-                    </Button>
-                  </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        <div className="lg:col-span-1">
-          <TripChat tripId={tripId} />
-        </div>
-      </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+              <div className="text-center py-8 px-4">
+                <p className="text-muted-foreground mb-4">
+                  No itinerary has been generated for this trip yet.
+                </p>
+                <Button onClick={handleGenerateItinerary} disabled={isGenerating}>
+                  {isGenerating ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                  ) : (
+                    <><Sparkles className="mr-2 h-4 w-4" /> Generate Itinerary</>
+                  )}
+                </Button>
+              </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -3,21 +3,30 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useUser, useAuth as useFirebaseAuth } from '@/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
-import { signOut } from 'firebase/auth';
-import { initiateEmailSignIn, initiateEmailSignUp } from '@/firebase/non-blocking-login';
+import {
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
+import {
+  initiateEmailSignIn,
+  initiateEmailSignUp,
+} from '@/firebase/non-blocking-login';
 
 type User = {
   uid: string;
   name: string | null;
   email: string | null;
+  photoURL: string | null;
 };
 
 type AuthContextType = {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => void;
+  loginWithGoogle: () => void;
   logout: () => void;
-  signup: (email: string, password: string) => void;
+  signup: (email: string, password: string, name: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         uid: firebaseUser.uid,
         name: firebaseUser.displayName,
         email: firebaseUser.email,
+        photoURL: firebaseUser.photoURL,
       });
     } else {
       setUser(null);
@@ -42,17 +52,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = (email: string, password: string) => {
     initiateEmailSignIn(auth, email, password);
   };
-  
+
+  const loginWithGoogle = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider).catch(error => {
+      console.error("Google sign-in error", error);
+    });
+  };
+
   const signup = (email: string, password: string) => {
     initiateEmailSignUp(auth, email, password);
-  }
+  };
 
   const logout = () => {
     signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading: isUserLoading, login, logout, signup }}>
+    <AuthContext.Provider
+      value={{ user, loading: isUserLoading, login, loginWithGoogle, logout, signup }}
+    >
       {children}
     </AuthContext.Provider>
   );

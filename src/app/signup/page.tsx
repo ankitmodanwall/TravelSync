@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -19,8 +19,14 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/auth-context';
 import { Logo } from '@/components/logo';
 import { placeholderImages } from '@/lib/placeholder-images';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft } from 'lucide-react';
 
@@ -36,7 +42,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { signup, loginWithGoogle, user, loading } = useAuth();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
 
   const form = useForm<FormValues>({
@@ -48,11 +55,15 @@ export default function SignupPage() {
     },
   });
 
+  useEffect(() => {
+    if (!loading && user) {
+      const from = searchParams.get('from') || '/dashboard';
+      router.push(from);
+    }
+  }, [user, loading, router, searchParams]);
+
   const onSubmit = (values: FormValues) => {
-    // In a real app, you'd call your auth service here.
-    console.log(values);
-    login({ email: values.email, name: values.name });
-    router.push('/dashboard');
+    signup(values.email, values.password, values.name);
   };
 
   const handleNext = async () => {
@@ -65,7 +76,7 @@ export default function SignupPage() {
       setStep(step + 1);
     }
   };
-  
+
   const handlePrevious = () => {
     setStep(step - 1);
   };
@@ -76,7 +87,7 @@ export default function SignupPage() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center">
-       {loginHeroImage && (
+      {loginHeroImage && (
         <Image
           src={loginHeroImage.imageUrl}
           alt={loginHeroImage.description}
@@ -87,131 +98,153 @@ export default function SignupPage() {
       )}
       <div className="relative z-10 w-full max-w-md p-4">
         <Card className="bg-background/80 backdrop-blur-sm">
-            <CardHeader className="text-center">
-                 <div className="mb-4 flex justify-center">
-                    <Logo />
+          <CardHeader className="text-center">
+            <div className="mb-4 flex justify-center">
+              <Logo />
+            </div>
+            <CardTitle className="text-3xl font-bold font-headline">
+              Sign Up
+            </CardTitle>
+            <CardDescription>
+              Join us to start planning your next adventure.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-6">
+              <Progress value={progressValue} className="w-full" />
+              <p className="mt-2 text-center text-sm text-muted-foreground">
+                Step {step} of 3
+              </p>
+            </div>
+
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="grid gap-4"
+              >
+                {step > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handlePrevious}
+                    className="absolute left-6 top-6"
+                    type="button"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" /> Back
+                  </Button>
+                )}
+
+                {step === 1 && (
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {step === 2 && (
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="m@example.com"
+                            {...field}
+                            type="email"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {step === 3 && (
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {step < 3 && (
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="w-full"
+                  >
+                    Continue
+                  </Button>
+                )}
+
+                {step === 3 && (
+                  <Button type="submit" className="w-full">
+                    Create Account
+                  </Button>
+                )}
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
                 </div>
-                <CardTitle className="text-3xl font-bold font-headline">Sign Up</CardTitle>
-                <CardDescription>
-                  Join us to start planning your next adventure.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-6">
-                <Progress value={progressValue} className="w-full" />
-                <p className="text-center text-sm text-muted-foreground mt-2">Step {step} of 3</p>
-              </div>
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-                      {step > 1 && (
-                        <Button variant="ghost" size="sm" onClick={handlePrevious} className="absolute left-6 top-6">
-                          <ChevronLeft className="mr-2 h-4 w-4" /> Back
-                        </Button>
-                      )}
-
-                      {step === 1 && (
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                <Input placeholder="John Doe" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                      )}
-                    
-                      {step === 2 && (
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                <Input
-                                    placeholder="m@example.com"
-                                    {...field}
-                                    type="email"
-                                />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                      )}
-
-                      {step === 3 && (
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                      )}
-
-                      {step < 3 && (
-                        <Button type="button" onClick={handleNext} className="w-full">
-                          Continue
-                        </Button>
-                      )}
-
-                      {step === 3 && (
-                        <Button type="submit" className="w-full">
-                            Create Account
-                        </Button>
-                      )}
-                    
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-background px-2 text-muted-foreground">
-                            Or continue with
-                          </span>
-                        </div>
-                      </div>
-
-                      <Button variant="outline" className="w-full">
-                          <svg
-                          className="mr-2 h-4 w-4"
-                          aria-hidden="true"
-                          focusable="false"
-                          data-prefix="fab"
-                          data-icon="google"
-                          role="img"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 488 512"
-                          >
-                          <path
-                              fill="currentColor"
-                              d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-69.2 69.2c-20.8-19.6-48.2-31.4-79-31.4-62.5 0-113.5 51.1-113.5 113.5s51 113.5 113.5 113.5c71.2 0 98.2-53.6 102.2-81.7H248v-87.3h236.1c2.3 12.7 3.9 26.9 3.9 42.4z"
-                          ></path>
-                          </svg>
-                          Sign Up with Google
-                      </Button>
-                    </form>
-                </Form>
-                <div className="mt-4 text-center text-sm">
-                    Already have an account?{' '}
-                    <Link href="/login" className="underline">
-                    Login
-                    </Link>
-                </div>
-            </CardContent>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  type="button"
+                  onClick={() => loginWithGoogle()}
+                >
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    aria-hidden="true"
+                    focusable="false"
+                    data-prefix="fab"
+                    data-icon="google"
+                    role="img"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 488 512"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-69.2 69.2c-20.8-19.6-48.2-31.4-79-31.4-62.5 0-113.5 51.1-113.5 113.5s51 113.5 113.5 113.5c71.2 0 98.2-53.6 102.2-81.7H248v-87.3h236.1c2.3 12.7 3.9 26.9 3.9 42.4z"
+                    ></path>
+                  </svg>
+                  Sign Up with Google
+                </Button>
+              </form>
+            </Form>
+            <div className="mt-4 text-center text-sm">
+              Already have an account?{' '}
+              <Link href="/login" className="underline">
+                Login
+              </Link>
+            </div>
+          </CardContent>
         </Card>
       </div>
     </div>

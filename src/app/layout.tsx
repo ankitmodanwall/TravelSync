@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/auth-context';
 import { FirebaseClientProvider } from '@/firebase';
 import { AuthRedirect } from '@/components/auth-redirect';
+import './i18n';
 
 export const metadata: Metadata = {
   title: 'TravelSync',

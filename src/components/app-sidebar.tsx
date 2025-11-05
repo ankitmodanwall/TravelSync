@@ -31,12 +31,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { isOpen } = useSidebar();
+  const { t, i18n } = useTranslation();
+
+  const handleLanguageChange = (lang: string) => {
+    i18n.changeLanguage(lang);
+  };
   
+  useEffect(() => {
+    // Optional: You might want to set the document's lang attribute
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   const isActive = (path: string) => pathname === path || (path.length > 1 && pathname.startsWith(path));
 
   return (
@@ -50,10 +62,10 @@ export default function AppSidebar() {
              <Link href="/dashboard" className="w-full">
                 <SidebarMenuButton
                 isActive={isActive('/dashboard')}
-                tooltip="Dashboard"
+                tooltip={t('dashboard')}
                 >
                 <Home />
-                <span>Dashboard</span>
+                <span>{t('dashboard')}</span>
                 </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -61,10 +73,10 @@ export default function AppSidebar() {
             <Link href="/trips/new" className="w-full">
                 <SidebarMenuButton
                 isActive={isActive('/trips/new')}
-                tooltip="New Trip"
+                tooltip={t('createTrip')}
                 >
                 <PlusCircle />
-                <span>Create Trip</span>
+                <span>{t('createTrip')}</span>
                 </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -73,10 +85,10 @@ export default function AppSidebar() {
                 <SidebarMenuButton
                 href="/budget"
                 isActive={isActive('/budget')}
-                tooltip="Budget"
+                tooltip={t('budget')}
                 >
                 <Landmark />
-                <span>Budget</span>
+                <span>{t('budget')}</span>
                 </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -84,10 +96,10 @@ export default function AppSidebar() {
             <Link href="/notifications" className="w-full">
                 <SidebarMenuButton
                 isActive={isActive('/notifications')}
-                tooltip="Notifications"
+                tooltip={t('notifications')}
                 >
                 <Bell />
-                <span>Notifications</span>
+                <span>{t('notifications')}</span>
                 {isOpen && <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 text-xs text-red-400">3</span>}
                 </SidebarMenuButton>
             </Link>
@@ -97,11 +109,11 @@ export default function AppSidebar() {
       <SidebarFooter className="flex flex-col gap-4">
         {isOpen ? (
             <div className="px-4">
-              <Select defaultValue="en">
+              <Select defaultValue={i18n.language} onValueChange={handleLanguageChange}>
                 <SelectTrigger className="w-full">
                   <div className='flex items-center gap-2'>
                     <Globe className='h-4 w-4'/>
-                    <SelectValue placeholder="Language" />
+                    <SelectValue placeholder={t('language')} />
                   </div>
                 </SelectTrigger>
                 <SelectContent>
@@ -114,7 +126,7 @@ export default function AppSidebar() {
             </div>
         ) : (
           <div className='px-2'>
-            <Select defaultValue="en">
+            <Select defaultValue={i18n.language} onValueChange={handleLanguageChange}>
               <SelectTrigger className="w-full justify-center">
                  <SelectValue asChild>
                     <Globe className='h-4 w-4' />
@@ -135,12 +147,12 @@ export default function AppSidebar() {
             {isOpen && (
               <div className="flex items-center gap-2">
                 <Link href="/settings">
-                    <SidebarMenuButton variant="ghost" size="icon" tooltip="Settings">
+                    <SidebarMenuButton variant="ghost" size="icon" tooltip={t('settings')}>
                         <Settings className="h-5 w-5"/>
                     </SidebarMenuButton>
                 </Link>
                 <Link href="/help">
-                  <SidebarMenuButton variant="ghost" size="icon" tooltip="Help">
+                  <SidebarMenuButton variant="ghost" size="icon" tooltip={t('help')}>
                       <HelpCircle className="h-5 w-5"/>
                   </SidebarMenuButton>
                 </Link>
@@ -150,12 +162,12 @@ export default function AppSidebar() {
          {!isOpen && (
             <div className="flex flex-col gap-2 items-center">
               <Link href="/settings">
-                <SidebarMenuButton variant="ghost" size="icon" tooltip="Settings">
+                <SidebarMenuButton variant="ghost" size="icon" tooltip={t('settings')}>
                     <Settings className="h-5 w-5"/>
                 </SidebarMenuButton>
               </Link>
               <Link href="/help">
-                <SidebarMenuButton variant="ghost" size="icon" tooltip="Help">
+                <SidebarMenuButton variant="ghost" size="icon" tooltip={t('help')}>
                     <HelpCircle className="h-5 w-5"/>
                 </SidebarMenuButton>
               </Link>

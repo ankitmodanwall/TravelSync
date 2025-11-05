@@ -1,37 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
-import { Card, CardContent } from '@/components/ui/card';
-import { ClipboardList, Map, MessageSquare } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-const previewCards = [
-  {
-    icon: <ClipboardList className="w-8 h-8 text-blue-400" />,
-    title: 'Itinerary',
-    description: 'Day 1: Eiffel Tower, Louvre',
-    rotation: '-rotate-6',
-    className: 'animate-fade-in-up'
-  },
-  {
-    icon: <Map className="w-8 h-8 text-green-400" />,
-    title: 'Map View',
-    description: 'Louvre to Notre Dame: 15 min walk',
-    rotation: 'rotate-2',
-    className: 'animate-fade-in-up animation-delay-200'
-  },
-  {
-    icon: <MessageSquare className="w-8 h-8 text-purple-400" />,
-    title: 'Team Chat',
-    description: 'Alice: "Let\'s get pastries!"',
-    rotation: 'rotate-12',
-    className: 'animate-fade-in-up animation-delay-400'
-  },
-];
+import { placeholderImages } from '@/lib/placeholder-images';
 
 export default function WelcomePage() {
+  const welcomeHeroImage = placeholderImages.find(p => p.id === 'welcome-hero');
+
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="flex items-center justify-center py-12">
@@ -57,33 +34,19 @@ export default function WelcomePage() {
           </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:flex items-center justify-center relative overflow-hidden">
-        <div className="relative w-full max-w-lg h-full flex items-center justify-center">
-           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10" />
-            {previewCards.map((card, index) => (
-              <Card
-                key={index}
-                className={cn(
-                  'absolute w-64 p-4 bg-white/60 dark:bg-card/60 backdrop-blur-sm shadow-2xl transition-transform duration-500 hover:scale-105 hover:!rotate-0',
-                  card.rotation,
-                  card.className
-                )}
-                style={{
-                  transformOrigin: 'center center',
-                  animationFillMode: 'forwards',
-                  opacity: 0,
-                }}
-              >
-                <CardContent className="flex flex-col items-center justify-center text-center gap-2 p-0">
-                    <div className='p-3 bg-white/80 rounded-full shadow-inner'>
-                        {card.icon}
-                    </div>
-                    <h3 className="font-bold text-lg">{card.title}</h3>
-                    <p className="text-sm text-muted-foreground">{card.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-        </div>
+      <div className="hidden bg-muted lg:block relative">
+        {welcomeHeroImage && (
+          <>
+            <Image
+              src={welcomeHeroImage.imageUrl}
+              alt={welcomeHeroImage.description}
+              fill
+              className="object-cover"
+              data-ai-hint={welcomeHeroImage.imageHint}
+            />
+             <div className="absolute inset-0 bg-gradient-to-l from-black/10 to-transparent" />
+          </>
+        )}
       </div>
     </div>
   );

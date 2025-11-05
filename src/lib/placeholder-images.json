@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "welcome-hero",
-      "description": "A vibrant and colorful hot air balloon festival at sunrise.",
-      "imageUrl": "https://images.unsplash.com/photo-1533309907659-60453a75871b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxob3QlMjBhaXIlMjBiYWxsb29uc3xlbnwwfHx8fDE3NjI0MjIwNzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "hot_air balloons"
+      "description": "A stunning aerial view of a winding road through a dense, foggy forest.",
+      "imageUrl": "https://images.unsplash.com/photo-1505144808419-1957a94ca61e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmb3Jlc3QlMjByb2FkfGVufDB8fHx8MTc2NTM4MTg4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "forest road"
     },
     {
       "id": "login-hero",

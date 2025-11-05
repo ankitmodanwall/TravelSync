@@ -7,7 +7,7 @@ import { PanelLeft } from "lucide-react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/lib/utils"
 import { Button, type ButtonProps } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import {
   Tooltip,
   TooltipContent,
@@ -48,7 +48,7 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
   return (
     <SidebarContext.Provider value={{ isOpen, setIsOpen, isDesktop }}>
       <TooltipProvider delayDuration={0}>
-         <Sheet open={!isDesktop && isOpen} onOpenChange={(open) => !isDesktop && setIsOpen(open)}>
+         <Sheet open={!isDesktop ? isOpen : false} onOpenChange={setIsOpen}>
            {children}
          </Sheet>
       </TooltipProvider>
@@ -60,7 +60,7 @@ export function Sidebar({
   className,
   children,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const { isDesktop } = useSidebar()
+  const { isOpen, isDesktop } = useSidebar()
 
   if (!isDesktop) {
     return (
@@ -68,6 +68,7 @@ export function Sidebar({
           side="left"
           className="w-[280px] p-0 border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl"
         >
+          <SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
           <div className="flex h-full flex-col">{children}</div>
         </SheetContent>
     )
@@ -75,6 +76,7 @@ export function Sidebar({
 
   return (
     <aside
+      data-collapsed={!isOpen}
       className={cn(
         "fixed left-0 top-0 z-40 h-screen w-0 md:w-[280px] border-r border-sidebar-border bg-sidebar/70 backdrop-blur-xl transition-all duration-300 ease-in-out",
         "data-[collapsed=true]:md:w-[70px]",
@@ -108,40 +110,25 @@ export function SidebarTrigger({
   className,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { isOpen, setIsOpen, isDesktop } = useSidebar()
+  const { isOpen, setIsOpen } = useSidebar()
 
   const handleClick = () => {
     setIsOpen(!isOpen)
   }
 
-  if (!isDesktop) {
-    return (
-       <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn("h-8 w-8 text-foreground", className)}
-          {...props}
-        >
-          <PanelLeft className="h-5 w-5" />
-          <span className="sr-only">Toggle Sidebar</span>
-        </Button>
-      </SheetTrigger>
-    )
-  }
-
-
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className={cn("h-8 w-8 text-foreground", className)}
-      onClick={handleClick}
-      {...props}
-    >
-      <PanelLeft className="h-5 w-5" />
-      <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+     <SheetTrigger asChild>
+      <Button
+        variant="ghost"
+        size="icon"
+        className={cn("h-8 w-8 text-foreground", className)}
+        onClick={handleClick}
+        {...props}
+      >
+        <PanelLeft className="h-5 w-5" />
+        <span className="sr-only">Toggle Sidebar</span>
+      </Button>
+    </SheetTrigger>
   )
 }
 

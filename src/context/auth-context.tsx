@@ -1,46 +1,58 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useUser, useAuth as useFirebaseAuth } from '@/firebase';
+import type { User as FirebaseUser } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
+import { initiateEmailSignIn, initiateEmailSignUp } from '@/firebase/non-blocking-login';
 
 type User = {
-  name: string;
-  email: string;
+  uid: string;
+  name: string | null;
+  email: string | null;
 };
 
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  login: (user: User) => void;
+  login: (email: string, password: string) => void;
   logout: () => void;
+  signup: (email: string, password: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const { user: firebaseUser, isUserLoading } = useUser();
+  const auth = useFirebaseAuth();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, you'd check for a token in localStorage or a cookie
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (firebaseUser) {
+      setUser({
+        uid: firebaseUser.uid,
+        name: firebaseUser.displayName,
+        email: firebaseUser.email,
+      });
+    } else {
+      setUser(null);
     }
-    setLoading(false);
-  }, []);
+  }, [firebaseUser]);
 
-  const login = (user: User) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
+  const login = (email: string, password: string) => {
+    initiateEmailSignIn(auth, email, password);
   };
+  
+  const signup = (email: string, password: string) => {
+    initiateEmailSignUp(auth, email, password);
+  }
 
   const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
+    signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading: isUserLoading, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );

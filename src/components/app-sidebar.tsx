@@ -83,7 +83,6 @@ export default function AppSidebar() {
           <SidebarMenuItem>
             <Link href="/budget" className="w-full">
                 <SidebarMenuButton
-                href="/budget"
                 isActive={isActive('/budget')}
                 tooltip={t('budget')}
                 >
@@ -127,8 +126,8 @@ export default function AppSidebar() {
         ) : (
           <div className='px-2'>
             <Select defaultValue={i18n.language} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="w-full justify-center">
-                 <SelectValue asChild>
+              <SelectTrigger className="w-full justify-center px-2">
+                 <SelectValue>
                     <Globe className='h-4 w-4' />
                  </SelectValue>
               </SelectTrigger>

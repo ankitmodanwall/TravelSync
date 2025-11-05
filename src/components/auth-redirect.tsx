@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
 const AUTH_ROUTES = ['/login', '/signup', '/'];
-const PROTECTED_ROUTES = ['/dashboard', '/budget', '/trips/new', '/notifications'];
+const PROTECTED_ROUTES = ['/dashboard', '/budget', '/trips/new', '/updates'];
 
 export function AuthRedirect({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();

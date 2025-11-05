@@ -7,6 +7,7 @@ import { collection, query, where } from 'firebase/firestore';
 import type { Trip } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
+import { useMemo } from 'react';
 
 function TripListSkeleton() {
   return (
@@ -32,7 +33,7 @@ export function TripList() {
     () => (firestore ? collection(firestore, 'trips') : null),
     [firestore]
   );
-
+  
   const tripsQuery = useMemoFirebase(
     () =>
       tripsRef && user
@@ -45,34 +46,16 @@ export function TripList() {
   );
 
   const {
-    data: tripsAsOwner,
-    isLoading: isLoadingOwner,
-  } = useCollection<Trip>(useMemoFirebase(() => tripsRef && user ? query(tripsRef, where('ownerId', '==', user.uid)) : null, [tripsRef, user]));
-  
-  const { 
-    data: tripsAsCollaborator, 
-    isLoading: isLoadingCollaborator 
+    data: trips,
+    isLoading,
   } = useCollection<Trip>(tripsQuery);
-
-  const isLoading = isLoadingOwner || isLoadingCollaborator;
-
-  const combinedTrips = useMemoFirebase(() => {
-    if (!tripsAsOwner && !tripsAsCollaborator) return [];
-    
-    const allTrips = new Map<string, Trip>();
-    
-    (tripsAsOwner || []).forEach(trip => allTrips.set(trip.id, trip));
-    (tripsAsCollaborator || []).forEach(trip => allTrips.set(trip.id, trip));
-
-    return Array.from(allTrips.values());
-  }, [tripsAsOwner, tripsAsCollaborator]);
 
 
   if (isLoading) {
     return <TripListSkeleton />;
   }
 
-  if (!combinedTrips || combinedTrips.length === 0) {
+  if (!trips || trips.length === 0) {
     return (
       <Alert>
         <Terminal className="h-4 w-4" />
@@ -87,7 +70,7 @@ export function TripList() {
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {combinedTrips.map(trip => (
+      {trips.map(trip => (
         <TripCard key={trip.id} trip={trip} />
       ))}
     </div>

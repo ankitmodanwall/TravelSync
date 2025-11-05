@@ -16,7 +16,7 @@ import { CalendarCheck, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User } from '@/lib/types';
+import type { User } from '@/lib/types';
 import {
   Tooltip,
   TooltipContent,

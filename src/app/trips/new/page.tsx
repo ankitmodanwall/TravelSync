@@ -53,8 +53,8 @@ const formSchema = z.object({
   ),
   tripType: z.string({ required_error: 'Please select a trip type.' }),
   budget: z.preprocess(
-    (a) => parseFloat(z.string().parse(a)),
-    z.number().positive({ message: "Budget must be a positive number." }).optional()
+    (a) => (a ? parseFloat(z.string().parse(a)) : undefined),
+    z.number().positive({ message: 'Budget must be a positive number.' }).optional()
   ),
 });
 
@@ -127,6 +127,7 @@ export default function NewTripPage() {
           destination: values.destination,
           duration,
           tripType: values.tripType,
+          budget: values.budget,
         });
 
         // Parse and update the document

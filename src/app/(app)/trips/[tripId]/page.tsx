@@ -66,6 +66,7 @@ export default function TripDetailPage() {
         destination: trip.destination,
         duration: duration,
         tripType: "leisure", // You might want to store tripType in the trip document
+        budget: trip.budget,
       });
 
       const itineraryObject = JSON.parse(aiResponse.itinerary);

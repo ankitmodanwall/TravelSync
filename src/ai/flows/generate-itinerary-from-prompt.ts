@@ -14,6 +14,7 @@ const GenerateItineraryInputSchema = z.object({
   destination: z.string().describe('The destination for the trip.'),
   duration: z.number().describe('The duration of the trip in days.'),
   tripType: z.string().describe('The type of trip (e.g., adventure, budget, leisure).'),
+  budget: z.number().optional().describe('The total budget for the trip in USD.'),
 });
 export type GenerateItineraryInput = z.infer<typeof GenerateItineraryInputSchema>;
 
@@ -30,7 +31,7 @@ const prompt = ai.definePrompt({
   name: 'generateItineraryPrompt',
   input: {schema: GenerateItineraryInputSchema},
   output: {schema: GenerateItineraryOutputSchema},
-  prompt: `You are a travel expert. Generate a {{duration}}-day travel itinerary for {{destination}} for a {{tripType}} trip. Respond with only the JSON formatted string as specified in the output schema.`,
+  prompt: `You are a travel expert. Generate a {{duration}}-day travel itinerary for {{destination}} for a {{tripType}} trip. {{#if budget}}The total budget for this trip is \${{budget}}. Make sure your suggestions are appropriate for this budget.{{/if}} Respond with only the JSON formatted string as specified in the output schema.`,
 });
 
 const generateItineraryFromPromptFlow = ai.defineFlow(

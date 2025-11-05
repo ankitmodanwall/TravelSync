@@ -7,7 +7,7 @@ import { Logo } from '@/components/logo';
 import { placeholderImages } from '@/lib/placeholder-images';
 
 export default function WelcomePage() {
-  const loginHeroImage = placeholderImages.find(p => p.id === 'login-hero');
+  const welcomeHeroImage = placeholderImages.find(p => p.id === 'welcome-hero');
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
@@ -28,7 +28,7 @@ export default function WelcomePage() {
           </div>
           <div className="flex flex-col gap-4 mx-auto w-full max-w-sm">
             <Button asChild size="lg" className="w-full">
-              <Link href="/signup">Get Started - It&apos;s Free</Link>
+              <Link href="/signup">Get Started - It's Free</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="w-full">
               <Link href="/login">Already have an account? Log In</Link>
@@ -37,13 +37,13 @@ export default function WelcomePage() {
         </div>
       </div>
       <div className="hidden bg-muted lg:block relative">
-        {loginHeroImage && (
+        {welcomeHeroImage && (
           <Image
-            src={loginHeroImage.imageUrl}
-            alt={loginHeroImage.description}
+            src={welcomeHeroImage.imageUrl}
+            alt={welcomeHeroImage.description}
             fill
             className="object-cover dark:brightness-[0.2] dark:grayscale"
-            data-ai-hint={loginHeroImage.imageHint}
+            data-ai-hint={welcomeHeroImage.imageHint}
           />
         )}
       </div>

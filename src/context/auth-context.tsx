@@ -56,11 +56,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider).catch(error => {
+      // This error occurs when the user closes the popup.
+      // It's a common user action and not a bug, so we can safely ignore it.
+      if (error.code === 'auth/cancelled-popup-request') {
+        return;
+      }
       console.error("Google sign-in error", error);
     });
   };
 
-  const signup = (email: string, password: string) => {
+  const signup = (email: string, password: string, name: string) => {
+    // The `initiateEmailSignUp` function doesn't currently handle setting the display name.
+    // This will be addressed in a subsequent step.
     initiateEmailSignUp(auth, email, password);
   };
 

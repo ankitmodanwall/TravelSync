@@ -19,7 +19,7 @@ import {
   User as FirebaseUser,
 } from 'firebase/auth';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { doc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 
 type User = {
   uid: string;
@@ -35,6 +35,7 @@ type AuthContextType = {
   loginWithGoogle: () => void;
   logout: () => void;
   signup: (email: string, password: string, name: string) => Promise<void>;
+  updateUserProfile: (data: { name?: string; photoURL?: string }) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,6 +50,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     (fbUser: FirebaseUser) => {
       if (firestore && fbUser) {
         const userRef = doc(firestore, 'userProfiles', fbUser.uid);
+        // This is a non-blocking write. It will optimistically update the local cache
+        // and sync with the server in the background. Errors are handled globally.
         setDocumentNonBlocking(
           userRef,
           {
@@ -119,6 +122,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
+  
+  const updateUserProfile = async (data: { name?: string; photoURL?: string }) => {
+    if (!auth.currentUser || !firestore) {
+      throw new Error("User not authenticated or Firestore not available.");
+    }
+    
+    const updateData: { displayName?: string; photoURL?: string } = {};
+    if (data.name) updateData.displayName = data.name;
+    if (data.photoURL) updateData.photoURL = data.photoURL;
+
+    // 1. Update Firebase Auth profile
+    await updateProfile(auth.currentUser, updateData);
+
+    // 2. Update Firestore userProfile document
+    const userRef = doc(firestore, 'userProfiles', auth.currentUser.uid);
+    // Here we use a standard awaited updateDoc because we want to ensure
+    // the operation completes before giving feedback to the user.
+    await updateDoc(userRef, updateData);
+    
+    // 3. Manually update local state to reflect changes immediately
+    setUser(prevUser => prevUser ? {
+      ...prevUser,
+      name: data.name ?? prevUser.name,
+      photoURL: data.photoURL ?? prevUser.photoURL,
+    } : null);
+  };
 
   const logout = () => {
     signOut(auth);
@@ -133,6 +162,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loginWithGoogle,
         logout,
         signup,
+        updateUserProfile,
       }}
     >
       {children}

@@ -55,16 +55,6 @@ export default function AppSidebar() {
               Create Trip
             </SidebarMenuButton>
           </SidebarMenuItem>
-           <SidebarMenuItem>
-            <SidebarMenuButton
-              href="/discover"
-              isActive={isActive('/discover')}
-              tooltip="Discover"
-            >
-              <Map />
-              Discover
-            </SidebarMenuButton>
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               href="/budget"

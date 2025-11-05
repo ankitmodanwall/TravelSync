@@ -1,14 +1,15 @@
 import type { Trip } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import Image from 'next/image';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MapPin } from 'lucide-react';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
 export function TripCard({ trip }: { trip: Trip }) {
-  const displayedCollaborators = trip.collaborators.slice(0, 3);
-  const remainingCollaborators = trip.collaborators.length - displayedCollaborators.length;
+
+  const dateRange = trip.startDate && trip.endDate 
+    ? `${format(trip.startDate.toDate(), 'LLL dd')} - ${format(trip.endDate.toDate(), 'dd, yyyy')}`
+    : 'Date not set';
 
   return (
     <Link href={`/trips/${trip.id}`} className="group block">
@@ -16,8 +17,8 @@ export function TripCard({ trip }: { trip: Trip }) {
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">
             <Image
-              src={trip.imageUrl}
-              alt={trip.title}
+              src={trip.imageUrl || 'https://picsum.photos/seed/default/600/400'}
+              alt={trip.name}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               data-ai-hint={trip.imageHint}
@@ -25,8 +26,8 @@ export function TripCard({ trip }: { trip: Trip }) {
           </div>
         </CardHeader>
         <CardContent className="p-4">
-          <h3 className="font-headline text-xl font-semibold mb-1 truncate group-hover:text-accent">
-            {trip.title}
+          <h3 className="font-headline text-xl font-semibold mb-1 truncate group-hover:text-primary">
+            {trip.name}
           </h3>
           <div className="flex items-center text-sm text-muted-foreground">
             <MapPin className="mr-2 h-4 w-4 shrink-0" />
@@ -34,29 +35,8 @@ export function TripCard({ trip }: { trip: Trip }) {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between items-center p-4 pt-0">
-          <div className="text-sm text-muted-foreground">{trip.dateRange}</div>
-          <div className="flex items-center -space-x-2">
-            <TooltipProvider>
-              {displayedCollaborators.map(c => (
-                <Tooltip key={c.id}>
-                  <TooltipTrigger asChild>
-                    <Avatar className="h-8 w-8 border-2 border-background">
-                      <AvatarImage src={c.avatarUrl} alt={c.name} />
-                      <AvatarFallback>{c.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{c.name}</p>
-                  </TooltipContent>
-                </Tooltip>
-              ))}
-            </TooltipProvider>
-            {remainingCollaborators > 0 && (
-              <Avatar className="h-8 w-8 border-2 border-background">
-                <AvatarFallback>+{remainingCollaborators}</AvatarFallback>
-              </Avatar>
-            )}
-          </div>
+          <div className="text-sm text-muted-foreground">{dateRange}</div>
+          {/* Collaborator avatars can be added back later if needed */}
         </CardFooter>
       </Card>
     </Link>

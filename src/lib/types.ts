@@ -1,3 +1,5 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export type Collaborator = {
   id: string;
   name: string;
@@ -20,11 +22,13 @@ export type ItineraryDay = {
 
 export type Trip = {
   id: string;
-  title: string;
+  name: string;
   destination: string;
-  dateRange: string;
+  startDate: Timestamp;
+  endDate: Timestamp;
   imageUrl: string;
   imageHint: string;
-  collaborators: Collaborator[];
+  ownerId: string;
+  collaboratorIds: string[];
   itinerary?: ItineraryDay[];
 };

@@ -1,41 +1,93 @@
 'use client';
 import { TripCard } from './trip-card';
-import { mockTrips } from '@/lib/mock-data';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect, useState } from 'react';
+import { useAuth } from '@/context/auth-context';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, where } from 'firebase/firestore';
+import type { Trip } from '@/lib/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Terminal } from 'lucide-react';
 
 function TripListSkeleton() {
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="space-y-4">
-                    <Skeleton className="h-48 w-full" />
-                    <div className="space-y-2 p-2">
-                        <Skeleton className="h-6 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                    </div>
-                </div>
-            ))}
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="space-y-4">
+          <Skeleton className="h-48 w-full" />
+          <div className="space-y-2 p-2">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
         </div>
-    )
+      ))}
+    </div>
+  );
 }
 
-
 export function TripList() {
-    const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const firestore = useFirestore();
 
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000);
-        return () => clearTimeout(timer);
-    }, []);
+  const tripsRef = useMemoFirebase(
+    () => (firestore ? collection(firestore, 'trips') : null),
+    [firestore]
+  );
 
-    if (loading) {
-        return <TripListSkeleton />;
-    }
+  const tripsQuery = useMemoFirebase(
+    () =>
+      tripsRef && user
+        ? query(
+            tripsRef,
+            where('collaboratorIds', 'array-contains', user.uid)
+          )
+        : null,
+    [tripsRef, user]
+  );
+
+  const {
+    data: tripsAsOwner,
+    isLoading: isLoadingOwner,
+  } = useCollection<Trip>(useMemoFirebase(() => tripsRef && user ? query(tripsRef, where('ownerId', '==', user.uid)) : null, [tripsRef, user]));
+  
+  const { 
+    data: tripsAsCollaborator, 
+    isLoading: isLoadingCollaborator 
+  } = useCollection<Trip>(tripsQuery);
+
+  const isLoading = isLoadingOwner || isLoadingCollaborator;
+
+  const combinedTrips = useMemoFirebase(() => {
+    if (!tripsAsOwner && !tripsAsCollaborator) return [];
+    
+    const allTrips = new Map<string, Trip>();
+    
+    (tripsAsOwner || []).forEach(trip => allTrips.set(trip.id, trip));
+    (tripsAsCollaborator || []).forEach(trip => allTrips.set(trip.id, trip));
+
+    return Array.from(allTrips.values());
+  }, [tripsAsOwner, tripsAsCollaborator]);
+
+
+  if (isLoading) {
+    return <TripListSkeleton />;
+  }
+
+  if (!combinedTrips || combinedTrips.length === 0) {
+    return (
+      <Alert>
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>No trips yet!</AlertTitle>
+        <AlertDescription>
+          You haven&apos;t created any trips or been invited to any. Click &quot;New
+          Trip&quot; to start planning your next adventure.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {mockTrips.map(trip => (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {combinedTrips.map(trip => (
         <TripCard key={trip.id} trip={trip} />
       ))}
     </div>

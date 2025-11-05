@@ -7,6 +7,7 @@ export type TravelSuggestion = {
   imageHint: string;
   topAttractions: string[];
   bestTimeToVisit: string;
+  aiRecommended?: boolean;
 };
 
 export const travelSuggestions: TravelSuggestion[] = [
@@ -25,6 +26,7 @@ export const travelSuggestions: TravelSuggestion[] = [
       "Gion Geisha District",
     ],
     bestTimeToVisit: 'Spring (March-May) for cherry blossoms and Autumn (October-November) for fall colors.',
+    aiRecommended: true,
   },
   {
     id: 'suggestion-2',
@@ -89,6 +91,7 @@ export const travelSuggestions: TravelSuggestion[] = [
       "Gondola to Bob's Peak",
     ],
     bestTimeToVisit: 'Summer (December-February) for hiking and water sports, or Winter (June-August) for snow activities.',
+    aiRecommended: true,
   },
   {
     id: 'suggestion-6',
@@ -137,5 +140,6 @@ export const travelSuggestions: TravelSuggestion[] = [
       'See the Northern Lights (Aurora Borealis)',
     ],
     bestTimeToVisit: 'Summer (June-August) for milder weather and long days. Winter (October-March) for the best chance to see the Northern Lights.',
+    aiRecommended: true,
   },
 ];

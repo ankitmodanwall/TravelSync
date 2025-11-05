@@ -11,7 +11,6 @@ import {
 import {
   Bell,
   Home,
-  Map,
   Settings,
   PlusCircle,
   HelpCircle,

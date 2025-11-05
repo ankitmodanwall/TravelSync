@@ -12,8 +12,8 @@ export function TripCard({ trip }: { trip: Trip }) {
     : 'Date not set';
 
   return (
-    <Link href={`/trips/${trip.id}`} className="group block">
-      <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <Link href={`/trips/${trip.id}`} className="group block animate-fade-in-up">
+      <Card className="overflow-hidden transition-all duration-300 ease-in-out bg-background/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1">
         <CardHeader className="p-0">
           <div className="relative h-48 w-full">
             <Image
@@ -23,6 +23,7 @@ export function TripCard({ trip }: { trip: Trip }) {
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               data-ai-hint={trip.imageHint}
             />
+             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           </div>
         </CardHeader>
         <CardContent className="p-4">
@@ -36,7 +37,6 @@ export function TripCard({ trip }: { trip: Trip }) {
         </CardContent>
         <CardFooter className="flex justify-between items-center p-4 pt-0">
           <div className="text-sm text-muted-foreground">{dateRange}</div>
-          {/* Collaborator avatars can be added back later if needed */}
         </CardFooter>
       </Card>
     </Link>

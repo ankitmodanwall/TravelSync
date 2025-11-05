@@ -58,7 +58,7 @@ export default function SignupPage() {
   useEffect(() => {
     if (!loading && user) {
       const from = searchParams.get('from') || '/dashboard';
-      router.push(from);
+      router.replace(from);
     }
   }, [user, loading, router, searchParams]);
 

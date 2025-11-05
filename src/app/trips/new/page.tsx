@@ -32,9 +32,9 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { generateItineraryFromPrompt } from '@/ai/flows/generate-itinerary-from-prompt';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -53,15 +53,25 @@ const formSchema = z.object({
 
 export default function NewTripPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   
+  const destinationParam = searchParams.get('destination');
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      destination: '',
+      destination: destinationParam || '',
     },
   });
+
+  useEffect(() => {
+    if (destinationParam) {
+      form.setValue('destination', destinationParam);
+    }
+  }, [destinationParam, form]);
+
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsGenerating(true);

@@ -1,13 +1,13 @@
-import { SidebarTrigger } from './ui/sidebar';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UserNav } from './user-nav';
 import { useAuth } from '@/context/auth-context';
+import type { ReactNode } from 'react';
 
 
-export default function Header() {
+export default function Header({ children }: { children?: ReactNode }) {
   const { user } = useAuth();
   return (
     <header
@@ -16,7 +16,7 @@ export default function Header() {
         'border-sidebar-border bg-background/10 backdrop-blur-sm'
       )}
     >
-      <SidebarTrigger className="md:hidden" />
+      {children}
       
       <div className="flex w-full items-center justify-end gap-2 md:gap-4">
         <Button

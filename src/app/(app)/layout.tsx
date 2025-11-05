@@ -3,6 +3,7 @@ import {
   SidebarProvider,
   Sidebar,
   SidebarInset,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
@@ -17,7 +18,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }}
       >
         <div className="min-h-screen w-full bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-violet-900/20">
-          <Header />
+          <Header>
+            <SidebarTrigger className="md:hidden" />
+          </Header>
           <Sidebar>
             <AppSidebar />
           </Sidebar>

@@ -20,19 +20,22 @@ import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
 import { UserNav } from './user-nav';
 import { useAuth } from '@/context/auth-context';
+import { useSidebar } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { isOpen } = useSidebar();
   
   const isActive = (path: string) => pathname === path;
 
   return (
     <>
       <SidebarHeader>
-        <Logo />
+        <Logo showText={isOpen} />
       </SidebarHeader>
-      <SidebarContent className="p-2">
+      <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -72,27 +75,36 @@ export default function AppSidebar() {
             >
               <Bell />
               <span>Notifications</span>
-              <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 text-xs text-red-400 group-data-[collapsible=icon]:hidden">3</span>
+              {isOpen && <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 text-xs text-red-400">3</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
-      <SidebarSeparator />
-      <SidebarFooter className="flex items-center justify-between p-3">
-        {user && <UserNav />}
-         <div className="flex-1" />
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton href="/settings" isActive={isActive('/settings')} variant="ghost" size="icon" tooltip="Settings">
-                    <Settings />
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-                <SidebarMenuButton href="/help" isActive={isActive('/help')} variant="ghost" size="icon" tooltip="Help">
-                    <HelpCircle />
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarFooter className="flex flex-col gap-4">
+        <SidebarSeparator />
+         <div className={cn("flex items-center", isOpen ? "justify-between" : "justify-center")}>
+            {user && (isOpen || !user.name) ? <UserNav /> : null}
+            {isOpen && (
+              <div className="flex items-center gap-2">
+                  <SidebarMenuButton href="/settings" isActive={isActive('/settings')} variant="ghost" size="icon" tooltip="Settings">
+                      <Settings className="h-5 w-5"/>
+                  </SidebarMenuButton>
+                  <SidebarMenuButton href="/help" isActive={isActive('/help')} variant="ghost" size="icon" tooltip="Help">
+                      <HelpCircle className="h-5 w-5"/>
+                  </SidebarMenuButton>
+              </div>
+            )}
+         </div>
+         {!isOpen && (
+            <div className="flex flex-col gap-2 items-center">
+              <SidebarMenuButton href="/settings" isActive={isActive('/settings')} variant="ghost" size="icon" tooltip="Settings">
+                  <Settings className="h-5 w-5"/>
+              </SidebarMenuButton>
+              <SidebarMenuButton href="/help" isActive={isActive('/help')} variant="ghost" size="icon" tooltip="Help">
+                  <HelpCircle className="h-5 w-5"/>
+              </SidebarMenuButton>
+          </div>
+         )}
       </SidebarFooter>
     </>
   );

@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }}
       >
         <div className="min-h-screen w-full bg-gradient-to-br from-blue-900/20 via-cyan-900/20 to-violet-900/20">
-          <Sidebar collapsible="icon">
+          <Sidebar>
             <AppSidebar />
           </Sidebar>
           <SidebarInset>

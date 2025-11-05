@@ -21,4 +21,10 @@ export default function HelpPage() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            
+            The help center is currently under construction.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

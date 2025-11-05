@@ -1,17 +1,26 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { useUser, useAuth as useFirebaseAuth } from '@/firebase';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from 'react';
+import { useUser, useAuth as useFirebaseAuth, useFirestore } from '@/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from 'firebase/auth';
 import {
   initiateEmailSignIn,
   initiateEmailSignUp,
 } from '@/firebase/non-blocking-login';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { doc } from 'firebase/firestore';
 
 type User = {
   uid: string;
@@ -34,10 +43,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user: firebaseUser, isUserLoading } = useUser();
   const auth = useFirebaseAuth();
+  const firestore = useFirestore();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (firebaseUser) {
+      // Create user profile in Firestore if it doesn't exist
+      const userRef = doc(firestore, 'userProfiles', firebaseUser.uid);
+      setDocumentNonBlocking(
+        userRef,
+        {
+          id: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+        },
+        { merge: true }
+      );
+      
       setUser({
         uid: firebaseUser.uid,
         name: firebaseUser.displayName,
@@ -47,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } else {
       setUser(null);
     }
-  }, [firebaseUser]);
+  }, [firebaseUser, firestore]);
 
   const login = (email: string, password: string) => {
     initiateEmailSignIn(auth, email, password);
@@ -58,17 +81,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signInWithPopup(auth, provider).catch(error => {
       // This error occurs when the user closes the popup.
       // It's a common user action and not a bug, so we can safely ignore it.
-      if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
+      if (
+        error.code === 'auth/cancelled-popup-request' ||
+        error.code === 'auth/popup-closed-by-user'
+      ) {
         return;
       }
-      console.error("Google sign-in error", error);
+      console.error('Google sign-in error', error);
     });
   };
 
-  const signup = (email: string, password: string, name: string) => {
-    // The `initiateEmailSignUp` function doesn't currently handle setting the display name.
-    // This will be addressed in a subsequent step.
-    initiateEmailSignUp(auth, email, password);
+  const signup = async (email: string, password: string, name: string) => {
+    try {
+      const userCredential = await initiateEmailSignUp(auth, email, password);
+      if (userCredential && userCredential.user) {
+        await updateProfile(userCredential.user, { displayName: name });
+        // The useEffect hook will handle creating the firestore doc
+        // and setting the user state.
+      }
+    } catch (error) {
+      console.error('Sign up error', error);
+    }
   };
 
   const logout = () => {
@@ -77,7 +110,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading: isUserLoading, login, loginWithGoogle, logout, signup }}
+      value={{
+        user,
+        loading: isUserLoading,
+        login,
+        loginWithGoogle,
+        logout,
+        signup,
+      }}
     >
       {children}
     </AuthContext.Provider>

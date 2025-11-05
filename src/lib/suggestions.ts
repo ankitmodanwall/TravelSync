@@ -74,4 +74,68 @@ export const travelSuggestions: TravelSuggestion[] = [
     ],
     bestTimeToVisit: 'Fall (September-November) and Spring (March-May) to avoid the intense summer heat.',
   },
+  {
+    id: 'suggestion-5',
+    title: 'Queenstown',
+    country: 'New Zealand',
+    description:
+      'Nestled on the shores of Lake Wakatipu, Queenstown is the adventure capital of the world. From bungee jumping to skiing, it offers adrenaline-pumping activities set against a backdrop of breathtaking alpine scenery.',
+    imageUrl: 'https://images.unsplash.com/photo-1579031737692-4950a412495b',
+    imageHint: 'Queenstown lake',
+    topAttractions: [
+      'Bungee Jumping at Kawarau Bridge',
+      'Milford Sound Cruise',
+      'Skiing at The Remarkables',
+      "Gondola to Bob's Peak",
+    ],
+    bestTimeToVisit: 'Summer (December-February) for hiking and water sports, or Winter (June-August) for snow activities.',
+  },
+  {
+    id: 'suggestion-6',
+    title: 'Chiang Mai',
+    country: 'Thailand',
+    description:
+      'A city of misty mountains, colorful hill tribes, and golden temples. Chiang Mai is a hub for spirituality and adventure, offering everything from elephant sanctuaries to vibrant night markets.',
+    imageUrl: 'https://images.unsplash.com/photo-1528181304800-259b08848526',
+    imageHint: 'Chiang Mai temple',
+    topAttractions: [
+      'Visit Doi Suthep temple',
+      'Explore the Old City walls and moats',
+      'Spend a day at an ethical elephant sanctuary',
+      'Shop at the Night Bazaar',
+    ],
+    bestTimeToVisit: 'The cool, dry season from November to February is the most pleasant.',
+  },
+  {
+    id: 'suggestion-7',
+    title: 'Marrakech',
+    country: 'Morocco',
+    description:
+      'Get lost in the vibrant chaos of Marrakech. This city is a sensory overload with its bustling souks, aromatic spices, stunning riads, and the lively Jemaa el-Fnaa square.',
+    imageUrl: 'https://images.unsplash.com/photo-1567982269559-0f4aa6adef94',
+    imageHint: 'Marrakech market',
+    topAttractions: [
+      'Jemaa el-Fnaa square',
+      'Jardin Majorelle',
+      'Bahia Palace',
+      'Shopping in the souks',
+    ],
+    bestTimeToVisit: 'Spring (March-May) and Autumn (September-November) offer comfortable temperatures for exploring.',
+  },
+  {
+    id: 'suggestion-8',
+    title: 'Iceland',
+    country: 'The Land of Fire and Ice',
+    description:
+      'A world of dramatic landscapes, where volcanoes, glaciers, geysers, and waterfalls coexist. Chase the Northern Lights in winter or enjoy the midnight sun in summer.',
+    imageUrl: 'https://images.unsplash.com/photo-1534279295099-c5b5a0b503b4',
+    imageHint: 'Iceland waterfall',
+    topAttractions: [
+      'The Blue Lagoon',
+      'The Golden Circle route (Gullfoss, Geysir, Þingvellir)',
+      'Jökulsárlón Glacier Lagoon',
+      'See the Northern Lights (Aurora Borealis)',
+    ],
+    bestTimeToVisit: 'Summer (June-August) for milder weather and long days. Winter (October-March) for the best chance to see the Northern Lights.',
+  },
 ];

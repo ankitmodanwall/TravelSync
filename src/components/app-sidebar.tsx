@@ -15,6 +15,7 @@ import {
   Settings,
   PlusCircle,
   HelpCircle,
+  Landmark,
 } from 'lucide-react';
 import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
@@ -62,6 +63,16 @@ export default function AppSidebar() {
             >
               <Map />
               Discover
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              href="/budget"
+              isActive={isActive('/budget')}
+              tooltip="Budget"
+            >
+              <Landmark />
+              Budget
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

@@ -32,10 +32,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <div
         className={cn(
-          'min-h-screen w-full bg-cover bg-center bg-fixed',
-          'bg-gradient-to-br from-indigo-100 via-sky-50 to-cyan-100',
-          'dark:from-indigo-900/50 dark:via-sky-900/50 dark:to-cyan-900/50'
+          'min-h-screen w-full bg-cover bg-center bg-fixed'
         )}
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1539635278303-d4002c07eae3?q=80&w=2070&auto=format&fit=crop')`,
+        }}
       >
         <Sidebar collapsible="icon">
           <AppSidebar />
